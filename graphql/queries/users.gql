@@ -1,0 +1,18 @@
+query {
+  users{
+    id
+    first_name
+    last_name
+    payments{
+      payment_method {
+        name
+      }
+    }
+		purchases {
+      id
+      products{
+        name
+      }
+    }
+  }
+}
