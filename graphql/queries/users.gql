@@ -3,6 +3,12 @@ query {
     id
     first_name
     last_name
+    membership {
+      name
+    }
+    roles{
+      name
+    }
     payments{
       payment_method {
         name

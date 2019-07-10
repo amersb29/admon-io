@@ -28,6 +28,11 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    // '~/plugins/apollo-error-handler',
+    '~/plugins/globalComponents',
+    '~/plugins/globalDirectives',
+    '~/plugins/paperDashboard',
+    '~/plugins/SidebarPlugin/index',
   ],
   /*
   ** Nuxt.js modules
