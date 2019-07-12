@@ -42,7 +42,7 @@ export default {
       }
     },
     isActive() {
-      return this.$el.classList.contains("active");
+      return this.$el.classList.contains("nuxt-link-active");
     }
   },
   mounted() {
