@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-      <div class="col-6">
+      <div class="col-12">
         <ApolloQuery
             :query="require('../../graphql/queries/users.gql')"
         >
@@ -17,6 +17,8 @@
                         <div slot="raw-content" class="table-responsive">
                             <b-table striped hover :class="tableClass" :items="data.users" :fields="fields">
                                 <template slot="name" slot-scope="data">
+                                    <i class="fa fa-circle" :class=" {'text-info': data.item.state, 
+                                                                    'text-danger': !data.item.state }"></i>
                                     {{ data.item.first_name }} {{ data.item.last_name }}
                                 </template>
                                 <template slot="roles" slot-scope="data">
@@ -87,19 +89,18 @@ export default {
   computed: {
     tableClass() {
       return `table-striped`;
-    }
+    },
+    
+  },
+  methods: {
+    
   },
   filters: {
     printRoles: function ( roles ) {
-        if (!roles) return ''
-        
-        let names = [];
-
-        roles.forEach( role => {
-            names.push(role.name);
-        });
-
-        return names.sort().toString().replace(/,/g, ', ');
+        return ( roles || [] )
+               .map( rol => rol.name)
+               .sort()
+               .join(', ');
     }
   },
 }

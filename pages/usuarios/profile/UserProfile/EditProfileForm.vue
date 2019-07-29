@@ -1,7 +1,7 @@
 <template>
   <card class="card" title="Edit Profile">
     <div>
-      <form @submit.prevent>
+      <form @submit.prevent="createUser">
         <div class="row">
           <div class="col-md-5">
             <fg-input type="text"
@@ -104,6 +104,7 @@
   </card>
 </template>
 <script>
+import createUserMut from '@/graphql/mutations/CreateUser.gql';
 export default {
   data() {
     return {
@@ -121,6 +122,23 @@ export default {
     };
   },
   methods: {
+    createUser(){
+      this.$apollo.mutate({
+        // Query
+        mutation: createUserMut,
+        // Parameters
+        variables: {
+          firstName: this.user.firstName,
+          lastName:  this.user.lastName,
+          email:     this.user.email,
+          password:  this.user.password,
+        }
+      }).then((data) => {
+        console.log(data)
+      }).catch((error) => {
+        console.error(error)
+      })
+    },
     updateProfile() {
       alert("Your data: " + JSON.stringify(this.user));
     }

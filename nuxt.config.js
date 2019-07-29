@@ -40,6 +40,8 @@ export default {
   modules: [
     // Doc: https://bootstrap-vue.js.org/docs/
     'bootstrap-vue/nuxt',
+    // Font awesome
+    '@nuxtjs/font-awesome',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
