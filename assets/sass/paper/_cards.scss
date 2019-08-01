@@ -248,4 +248,22 @@
   .image {
     border-radius: 4px;
   }
+
+  .card-actions{
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+    list-style: none;
+
+    li {
+      border-radius: 50%;
+      height: 50px;
+      padding: 7px 15px;
+      width: 50px;
+
+      a{
+        font-size: 1.5rem;
+      }
+    }
+  }
 }

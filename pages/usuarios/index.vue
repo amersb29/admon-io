@@ -13,7 +13,7 @@
 
                 <!-- Result -->
                 <div v-else-if="data" class="result apollo">
-                    <card :title="table1.title" :subTitle="table1.subTitle">
+                    <card :title="table1.title" :subTitle="table1.subTitle" :hasActions="true" :action="sayHello">
                         <div slot="raw-content" class="table-responsive">
                             <b-table striped hover :class="tableClass" :items="data.users" :fields="fields">
                                 <template slot="name" slot-scope="data">
@@ -93,7 +93,9 @@ export default {
     
   },
   methods: {
-    
+    sayHello(){
+      console.log('Hello')
+    }
   },
   filters: {
     printRoles: function ( roles ) {

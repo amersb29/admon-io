@@ -30,21 +30,7 @@
 import gql from 'graphql-tag'
 
 export default {
-    // data(){
-    //     return {
-    //         users: []
-    //     }
-    // },
-    // apollo: {
-    //     // Simple query that will update the 'hello' vue property
-    //     users: gql`{
-    //         users{
-    //             id
-    //             first_name
-    //             last_name
-    //         }
-    //     }`,
-    // },
+
 }
 </script>
 

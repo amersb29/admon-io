@@ -9,6 +9,7 @@
             "request": "launch",
             "name": "Admon IO",
             "url": "http://localhost:3000",
+            "port": 9878,
             "webRoot": "${workspaceFolder}"
         }
     ]
