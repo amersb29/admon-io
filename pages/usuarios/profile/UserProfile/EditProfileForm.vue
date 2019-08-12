@@ -56,11 +56,27 @@
           </div>
           <div class="col-md-6">
             <label for="">Membres&iacute;a</label>
-            <b-form-select v-model="user.membership" class="custom-dropdown">
-              <option :value="null">Selecciona una opci&oacute;n</option>
-              <option value="a">Option A</option>
-              <option value="b">Option B</option>
-            </b-form-select>
+            <ApolloQuery :query="require('@/graphql/queries/select_memberships.gql')">
+              <template v-slot="{ result: { loading, error, data } }">
+                <!-- Loading -->
+                <div v-if="loading" class="loading apollo">Loading...</div>
+
+                <!-- Error -->
+                <div v-else-if="error" class="error apollo">An error occurred</div>
+
+                <!-- Result -->
+                <div v-else-if="data" class="result apollo">
+                  <b-form-select v-model="user.membership" class="custom-dropdown">
+                    <option :value="null">Sin membres&iacute;a</option>
+                    <option :value="mem.id" v-for="mem of data.mem_combo" :key="mem.id"> {{  mem.name }}</option>
+                  </b-form-select>
+                </div>
+
+                <!-- No result -->
+                <div v-else class="no-result apollo">No result :(</div>
+              </template>
+            </ApolloQuery>
+            
           </div>
         </div>
 
@@ -108,7 +124,7 @@ export default {
         city: "",
         postalCode: "",
         aboutMe: "",
-        membership: ""
+        membership: null
       }
     };
   },
@@ -123,6 +139,7 @@ export default {
           lastName:  this.user.lastName,
           email:     this.user.email,
           password:  this.user.password,
+          mem_id:    this.user.membership,
         }
       }).then((data) => {
         this.$emit('user-created');

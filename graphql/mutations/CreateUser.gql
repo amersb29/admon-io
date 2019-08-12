@@ -3,12 +3,14 @@ mutation(
     $lastName:  String!
     $email:     String!
     $password:  String!
+    $mem_id:    Int
 ){
     createUser(
         first_name: $firstName
         last_name:  $lastName
         email:      $email
         password:   $password
+        memberships_id: $mem_id
     ){
         id
     }

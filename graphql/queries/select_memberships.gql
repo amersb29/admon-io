@@ -1,0 +1,6 @@
+query {
+  mem_combo: memberships {
+    id
+    name
+  }
+}

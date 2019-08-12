@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "C:\\Users\\amer.salgado\\Programs\\laragon\\www\\membresias-IO"
 		}
 	],
 	"settings": {}
