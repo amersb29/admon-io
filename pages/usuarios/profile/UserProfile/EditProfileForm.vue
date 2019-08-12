@@ -1,38 +1,13 @@
 <template>
-  <card class="card" title="Edit Profile">
+  <card class="card" :title="formTitle">
     <div>
-      <form @submit.prevent="createUser">
-        <div class="row">
-          <div class="col-md-5">
-            <fg-input type="text"
-                      label="Company"
-                      :disabled="true"
-                      placeholder="Paper dashboard"
-                      v-model="user.company">
-            </fg-input>
-          </div>
-          <div class="col-md-3">
-
-            <fg-input type="text"
-                      label="Username"
-                      placeholder="Username"
-                      v-model="user.username">
-            </fg-input>
-          </div>
-          <div class="col-md-4">
-            <fg-input type="email"
-                      label="Username"
-                      placeholder="Email"
-                      v-model="user.email">
-            </fg-input>
-          </div>
-        </div>
-
+      <form>
         <div class="row">
           <div class="col-md-6">
             <fg-input type="text"
                       label="First Name"
                       placeholder="First Name"
+                      required
                       v-model="user.firstName">
             </fg-input>
           </div>
@@ -47,42 +22,52 @@
 
         <div class="row">
           <div class="col-md-12">
-            <fg-input type="text"
-                      label="Address"
-                      placeholder="Home Address"
-                      v-model="user.address">
+            <fg-input type="email"
+                      label="Email"
+                      placeholder="Email"
+                      v-model="user.email">
             </fg-input>
           </div>
         </div>
 
         <div class="row">
-          <div class="col-md-4">
-            <fg-input type="text"
-                      label="City"
-                      placeholder="City"
-                      v-model="user.city">
+          <div class="col-md-6">
+            <fg-input type="password"
+                      label="Contraseña"
+                      placeholder="Contraseña"
+                      v-model="user.password">
             </fg-input>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
+            <fg-input type="password"
+                      label="Confirmar Contraseña"
+                      placeholder="Confirmar Contraseña">
+            </fg-input>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
             <fg-input type="text"
                       label="Country"
                       placeholder="Country"
                       v-model="user.country">
             </fg-input>
           </div>
-          <div class="col-md-4">
-            <fg-input type="number"
-                      label="Postal Code"
-                      placeholder="ZIP Code"
-                      v-model="user.postalCode">
-            </fg-input>
+          <div class="col-md-6">
+            <label for="">Membres&iacute;a</label>
+            <b-form-select v-model="user.membership" class="custom-dropdown">
+              <option :value="null">Selecciona una opci&oacute;n</option>
+              <option value="a">Option A</option>
+              <option value="b">Option B</option>
+            </b-form-select>
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-12">
             <div class="form-group">
-              <label>About Me</label>
+              <label>Notas</label>
               <textarea rows="5" class="form-control border-input"
                         placeholder="Here can be your description"
                         v-model="user.aboutMe">
@@ -92,10 +77,10 @@
           </div>
         </div>
         <div class="text-center">
-          <p-button type="info"
+          <p-button type="submit"
                     round
-                    @click.native.prevent="updateProfile">
-            Update Profile
+                    @click.native.prevent="createUser">
+            {{ textButton }}
           </p-button>
         </div>
         <div class="clearfix"></div>
@@ -105,19 +90,25 @@
 </template>
 <script>
 import createUserMut from '@/graphql/mutations/CreateUser.gql';
+
 export default {
+  props: {
+    formTitle: String,
+    textButton: String,
+  },
   data() {
     return {
       user: {
-        company: "Paper Dashboard",
-        username: "michael23",
+        company: "",
+        username: "",
         email: "",
-        firstName: "Chet",
-        lastName: "Faker",
-        address: "Melbourne, Australia",
-        city: "Melbourne",
+        firstName: "",
+        lastName: "",
+        address: "",
+        city: "",
         postalCode: "",
-        aboutMe: `We must accept finite disappointment, but hold on to infinite hope.`
+        aboutMe: "",
+        membership: ""
       }
     };
   },
@@ -134,16 +125,19 @@ export default {
           password:  this.user.password,
         }
       }).then((data) => {
-        console.log(data)
+        this.$emit('user-created');
       }).catch((error) => {
-        console.error(error)
+        this.$emit('user-creation-error');
       })
     },
-    updateProfile() {
-      alert("Your data: " + JSON.stringify(this.user));
-    }
   }
 };
 </script>
-<style>
+<style lang="scss">
+.custom-select {
+  background-color: #fffcf5;
+  border-color: #9A9A9A;
+  color: #66615b;
+}
 </style>
+

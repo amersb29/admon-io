@@ -9,11 +9,11 @@
           <h4 class="card-title">{{title}}</h4>
           <p class="card-category" v-if="subTitle">{{subTitle}}</p>
         </section>
-        <section>
-          <ul class="card-actions" v-if="hasActions">
-            <li @click="action">
+        <section v-if="actions">
+          <ul class="card-actions" v-for="action in actions" :key="action.name">
+            <li @click="emit(action.eventName)">
               <a href="#">
-                <i class="fa fa-close"></i>
+                <i :class="actionIcon( action.icon )"></i>
               </a>
             </li>
           </ul>
@@ -34,28 +34,42 @@
 export default {
   name: "card",
   props: {
-    action: Function,
+    actions: Array,
     hasActions: Boolean,
     subTitle: String,
     title: String,
+  },
+  methods: {
+    actionIcon( icon ){
+      return `fa fa-${icon}`;
+    },
+    emit(eventName){
+      this.$emit( eventName );
+    }
   }
 };
 </script>
 <style lang="scss">
+  .card-title{
+    font-size: 2.5rem;
+  }
+
   .card-actions{
     display: flex;
-    justify-content: flex-end;
     flex-direction: row;
+    justify-content: flex-end;
+    line-height: 1.2em;
     list-style: none;
 
     li {
-      border-radius: 50%;
+      // border-radius: 50%;
       height: 50px;
-      padding: 7px 15px;
+      // padding: 7px 15px;
       width: 50px;
 
       a{
-        font-size: 1.5rem;
+        color: #229863;
+        font-size: 2.5rem;
       }
     }
   }

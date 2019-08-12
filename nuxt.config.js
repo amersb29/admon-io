@@ -47,6 +47,8 @@ export default {
     '@nuxtjs/pwa',
     //Apollo
     '@nuxtjs/apollo',
+    //Sweet Alert 2
+    'nuxt-sweetalert2',
   ],
   /*
   ** Axios module configuration

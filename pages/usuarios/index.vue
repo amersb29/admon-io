@@ -13,7 +13,9 @@
 
                 <!-- Result -->
                 <div v-else-if="data" class="result apollo">
-                    <card :title="table1.title" :subTitle="table1.subTitle" :hasActions="true" :action="sayHello">
+                    <card :title="table1.title" 
+                          :actions="table1.actions" 
+                          @create-user-modal="sayHello">
                         <div slot="raw-content" class="table-responsive">
                             <b-table striped hover :class="tableClass" :items="data.users" :fields="fields">
                                 <template slot="name" slot-scope="data">
@@ -46,11 +48,22 @@
             </template>
         </ApolloQuery>
       </div>
+      <b-modal id="create-user-modal" title="Registrar Usuario" hide-footer hide-header>
+        <edit-profile-form textButton="Registrar Usuario" 
+                           formTitle="Registrar Usuarios"
+                           @user-created="userCreated"
+                           @user-creation-error="userCreationError">
+        </edit-profile-form>
+      </b-modal>
+      <div ref="container"></div>
     </div>
 </template>
 
 <script>
+import EditProfileForm from './profile/UserProfile/EditProfileForm.vue'
+
 export default {
+  components: {EditProfileForm},
   layout: 'dashboard/DashboardLayout',
   data() {
       return {
@@ -81,9 +94,10 @@ export default {
         ],
         table1: {
             title: "Usuarios",
-            subTitle: "Usuarios registrados en la plataforma",
             columns: ["Id", "Nombre", "Membresía", "Roles"],
+            actions: [{name: 'Create Users', icon: 'plus-square', eventName: 'create-user-modal'  }]
         },
+        modalShowed: false,
       }
   },
   computed: {
@@ -93,8 +107,40 @@ export default {
     
   },
   methods: {
-    sayHello(){
-      console.log('Hello')
+    sayHello(e){
+      this.$bvModal.show('create-user-modal')
+    },
+    userCreated(e){
+      this.$bvModal.hide('create-user-modal')
+      
+      const options = {
+        icon: 'ti-user',
+        horizontal: 'center',
+        vertical: 'top',
+        message: 'El Usuario ha sido creado correctamente',
+        type: 'success'
+      }
+      this.showNotification( options )
+    },
+    userCreationError(e) {
+      const options = {
+        icon: 'ti-user',
+        horizontal: 'center',
+        vertical: 'top',
+        message: 'Hubo un error al crear al Usuario',
+        type: 'danger'
+      }
+      this.showNotification( options )
+    },
+    showNotification( options ) {
+      this.$notify({
+        // component: NotificationTemplate,
+        message: options.message,
+        icon: options.icon,
+        horizontalAlign: options.horizontal,
+        verticalAlign: options.vertical,
+        type: options.type
+      });
     }
   },
   filters: {
@@ -108,6 +154,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+  .modal-title {
+    font-size: 2.5em;
+  }
 </style>
