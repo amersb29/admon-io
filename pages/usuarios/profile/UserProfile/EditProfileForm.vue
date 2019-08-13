@@ -48,11 +48,11 @@
 
         <div class="row">
           <div class="col-md-6">
-            <fg-input type="text"
-                      label="Country"
-                      placeholder="Country"
-                      v-model="user.country">
-            </fg-input>
+            <label for="memberships">Pa&iacute;s</label>
+            <b-form-select id="memberships" v-model="user.country" class="custom-dropdown">
+              <option :value="1" selected> MX</option>
+              <option :value="2">  USA</option>
+            </b-form-select>
           </div>
           <div class="col-md-6">
             <label for="">Membres&iacute;a</label>
@@ -106,6 +106,7 @@
 </template>
 <script>
 import createUserMut from '@/graphql/mutations/CreateUser.gql';
+import { log } from 'util';
 
 export default {
   props: {
@@ -124,11 +125,19 @@ export default {
         city: "",
         postalCode: "",
         aboutMe: "",
+        country: 1,
         membership: null
       }
     };
   },
+  computed: {
+    
+  },
   methods: {
+    getFlag( code ){console.log("getFlag::", require(`@/assets/img/${code}_flag.png`));
+    
+      return require(`@/assets/img/${code}_flag.png`);
+    },
     createUser(){
       this.$apollo.mutate({
         // Query
