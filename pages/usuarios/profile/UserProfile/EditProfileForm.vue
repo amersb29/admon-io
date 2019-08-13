@@ -49,10 +49,25 @@
         <div class="row">
           <div class="col-md-6">
             <label for="memberships">Pa&iacute;s</label>
-            <b-form-select id="memberships" v-model="user.country" class="custom-dropdown">
-              <option :value="1" selected> MX</option>
-              <option :value="2">  USA</option>
-            </b-form-select>
+            <ApolloQuery :query="require('@/graphql/queries/select_countries.gql')">
+              <template v-slot="{ result: { loading, error, data } }">
+                <!-- Loading -->
+                <div v-if="loading" class="loading apollo">Loading...</div>
+
+                <!-- Error -->
+                <div v-else-if="error" class="error apollo">An error occurred</div>
+
+                <!-- Result -->
+                <div v-else-if="data" class="result apollo">
+                  <b-form-select id="memberships" v-model="user.country" class="custom-dropdown">
+                    <option v-for="country of data.countries_combo" :value="country.id" :selected="country.id === 1" :key="country.id"> {{ country.code }}</option>
+                  </b-form-select>
+                </div>
+
+                <!-- No result -->
+                <div v-else class="no-result apollo">No result :(</div>
+              </template>
+            </ApolloQuery>
           </div>
           <div class="col-md-6">
             <label for="">Membres&iacute;a</label>
@@ -149,6 +164,7 @@ export default {
           email:     this.user.email,
           password:  this.user.password,
           mem_id:    this.user.membership,
+          country_id: this.user.country,
         }
       }).then((data) => {
         this.$emit('user-created');

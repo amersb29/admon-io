@@ -4,6 +4,7 @@ mutation(
     $email:     String!
     $password:  String!
     $mem_id:    Int
+    $country_id: Int
 ){
     createUser(
         first_name: $firstName
@@ -11,6 +12,7 @@ mutation(
         email:      $email
         password:   $password
         memberships_id: $mem_id
+        countries_id: $country_id
     ){
         id
     }
