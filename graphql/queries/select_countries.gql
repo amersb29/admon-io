@@ -1,6 +1,6 @@
 query {
   countries_combo: countries{
     id
-  	code
+  	name
   }
 }

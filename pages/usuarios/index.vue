@@ -2,7 +2,7 @@
     <div class="row">
       <div class="col-12">
         <ApolloQuery
-            :query="require('../../graphql/queries/users.gql')"
+            :query="require('@/graphql/queries/users.gql')"
         >
             <template v-slot="{ result: { loading, error, data } }">
                 <!-- Loading -->
@@ -52,7 +52,8 @@
         <edit-profile-form textButton="Registrar Usuario" 
                            formTitle="Registrar Usuarios"
                            @user-created="userCreated"
-                           @user-creation-error="userCreationError">
+                           @user-creation-error="userCreationError"
+                           :updateMethod="updateCache">
         </edit-profile-form>
       </b-modal>
       <div ref="container"></div>
@@ -61,6 +62,7 @@
 
 <script>
 import EditProfileForm from './profile/UserProfile/EditProfileForm.vue'
+import usersList from '@/graphql/queries/users.gql';
 
 export default {
   components: {EditProfileForm},
@@ -121,6 +123,18 @@ export default {
         type: 'success'
       }
       this.showNotification( options )
+    },
+    updateCache(store, {data: { createUser } }){
+      const query = {query: usersList };
+
+      const data = store.readQuery( query )
+
+      data.users.push(createUser)
+      // Write back to the cache
+      store.writeQuery({
+        ...query,
+        data,
+      })
     },
     userCreationError(e) {
       const options = {

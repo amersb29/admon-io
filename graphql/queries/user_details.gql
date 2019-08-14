@@ -10,5 +10,16 @@ query {
     roles{
       name
     }
+    payments{
+      payment_method {
+        name
+      }
+    }
+		purchases {
+      id
+      products{
+        name
+      }
+    }
   }
 }

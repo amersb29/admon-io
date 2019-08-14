@@ -1,5 +1,5 @@
 query {
-  mem_combo: memberships {
+  memberships_combo: memberships {
     id
     name
   }

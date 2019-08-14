@@ -1,0 +1,6 @@
+query{
+    roles_combo: roles{
+        id
+        name
+    }
+}

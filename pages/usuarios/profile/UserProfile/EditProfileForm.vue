@@ -48,50 +48,44 @@
 
         <div class="row">
           <div class="col-md-6">
-            <label for="memberships">Pa&iacute;s</label>
-            <ApolloQuery :query="require('@/graphql/queries/select_countries.gql')">
-              <template v-slot="{ result: { loading, error, data } }">
-                <!-- Loading -->
-                <div v-if="loading" class="loading apollo">Loading...</div>
-
-                <!-- Error -->
-                <div v-else-if="error" class="error apollo">An error occurred</div>
-
-                <!-- Result -->
-                <div v-else-if="data" class="result apollo">
-                  <b-form-select id="memberships" v-model="user.country" class="custom-dropdown">
-                    <option v-for="country of data.countries_combo" :value="country.id" :selected="country.id === 1" :key="country.id"> {{ country.code }}</option>
-                  </b-form-select>
-                </div>
-
-                <!-- No result -->
-                <div v-else class="no-result apollo">No result :(</div>
-              </template>
-            </ApolloQuery>
+            <label for="countries">Pa&iacute;s</label>
+            <apollo-select
+              id="apollo_countries"
+              gqlQuery="countries"
+              selectedValue="1" 
+              optionText="name"
+              @change="onSelectChange($event, 'country')"
+            />
           </div>
           <div class="col-md-6">
-            <label for="">Membres&iacute;a</label>
-            <ApolloQuery :query="require('@/graphql/queries/select_memberships.gql')">
-              <template v-slot="{ result: { loading, error, data } }">
-                <!-- Loading -->
-                <div v-if="loading" class="loading apollo">Loading...</div>
+            <label for="memberships">Membres&iacute;a</label>
+            <apollo-select
+              id="apollo_memberships"
+              gqlQuery="memberships" 
+              optionText="name"
+              initialNullText="Sin membresía"
+              @change="onSelectChange($event, 'membership')"
+            />            
+          </div>
+        </div>
 
-                <!-- Error -->
-                <div v-else-if="error" class="error apollo">An error occurred</div>
-
-                <!-- Result -->
-                <div v-else-if="data" class="result apollo">
-                  <b-form-select v-model="user.membership" class="custom-dropdown">
-                    <option :value="null">Sin membres&iacute;a</option>
-                    <option :value="mem.id" v-for="mem of data.mem_combo" :key="mem.id"> {{  mem.name }}</option>
-                  </b-form-select>
-                </div>
-
-                <!-- No result -->
-                <div v-else class="no-result apollo">No result :(</div>
-              </template>
-            </ApolloQuery>
-            
+        <div class="row">
+          <div class="col-md-6">
+            <label for="state">Estado</label>
+            <b-form-select id="state" class="custom-dropdown" v-model="user.state">
+              <option value="0" selected>Inactivo</option>
+              <option value="1" >Activo</option>
+            </b-form-select>
+          </div>
+          <div class="col-md-6">
+            <label for="role">Perfil</label>
+            <apollo-select
+              id="apollo_roles"
+              gqlQuery="roles"
+              optionText="name"
+              selectedValue="4"
+              @change="onSelectChange($event, 'rol')"
+            />
           </div>
         </div>
 
@@ -119,14 +113,21 @@
     </div>
   </card>
 </template>
+
 <script>
+import ApolloSelect from '../../../../components/ApolloSelect.vue';
 import createUserMut from '@/graphql/mutations/CreateUser.gql';
+
 import { log } from 'util';
 
 export default {
   props: {
     formTitle: String,
     textButton: String,
+    updateMethod: Function
+  },
+  components: {
+    ApolloSelect
   },
   data() {
     return {
@@ -136,12 +137,10 @@ export default {
         email: "",
         firstName: "",
         lastName: "",
-        address: "",
-        city: "",
-        postalCode: "",
-        aboutMe: "",
-        country: 1,
-        membership: null
+        country: "1",
+        membership: null,
+        state: "0",
+        rol: "4"
       }
     };
   },
@@ -149,8 +148,8 @@ export default {
     
   },
   methods: {
+    onSelectChange(e, attr) { this.user[ attr ] = e; },
     getFlag( code ){console.log("getFlag::", require(`@/assets/img/${code}_flag.png`));
-    
       return require(`@/assets/img/${code}_flag.png`);
     },
     createUser(){
@@ -165,13 +164,21 @@ export default {
           password:  this.user.password,
           mem_id:    this.user.membership,
           country_id: this.user.country,
-        }
+          state: this.user.state,
+        },
+        update: this.updateMethod
       }).then((data) => {
         this.$emit('user-created');
+        debugger
+        data.get('createUser').get('id');
+
+        log("Resultado: ",data);
+
       }).catch((error) => {
         this.$emit('user-creation-error');
       })
     },
+
   }
 };
 </script>
