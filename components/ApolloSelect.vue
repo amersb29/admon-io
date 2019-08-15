@@ -9,9 +9,12 @@
 
         <!-- Result -->
         <div v-else-if="data" class="result apollo">
-            <b-form-select :id="gqlQuery" class="custom-dropdown" @change="onOptionChange">
-            <option v-if="selectedValue === undefined" :value="null" :selected=true>{{ initialNullText || 'Seleccione una opción' }}</option>
-            <option v-for="el of data[`${gqlQuery}_combo`]" :value="el.id" :selected="String(el.id) === selectedValue" :key="el.id"> {{ el[optionText] }}</option>
+            <!-- <b-form-select v-if="arrayModel" :id="gqlQuery" class="custom-dropdown" @change="onOptionChange" multiple v-model="arrayModel">
+                <option v-for="el of data[`${gqlQuery}_combo`]" :value="el.id" :key="el.id"> {{ el[optionText] }}</option>
+            </b-form-select> -->
+            <b-form-select :id="gqlQuery" class="custom-dropdown" @change="onOptionChange" :multiple="arrayModel !== undefined" v-model="selected">
+                <option v-if="selectedValue === undefined && !arrayModel" :value="null">{{ initialNullText || 'Seleccione una opción' }}</option>
+                <option v-for="el of data[`${gqlQuery}_combo`]" :value="el.id" :selected="String(el.id) === selectedValue" :key="el.id"> {{ el[optionText] }}</option>
             </b-form-select>
         </div>
 
@@ -27,14 +30,28 @@ export default {
         gqlQuery: String,
         selectedValue: String, 
         optionText: String,
-        initialNullText: String
+        initialNullText: String,
+        model: String,
+        arrayModel: Array
     },
     computed: {
-        
+        selected: {
+            get: function (){
+                    if (this.arrayModel !== undefined)
+                        return this.arrayModel
+                    else if ( this.selectedValue !== undefined )
+                        return this.optSelected
+                    else
+                        return null
+                },
+            set: function ( val ) {
+                this.optSelected = val
+            }
+        }
     },
     data() {
         return {
-            id: ''
+            optSelected: this.selectedValue
         }
     },
     methods: {

@@ -6,8 +6,9 @@ mutation(
     $mem_id:    Int
     $country_id: Int
     $state: Int!
+    $roles: [ID!]
 ){
-    createUser(
+    createUser( input: {
         first_name: $firstName
         last_name:  $lastName
         email:      $email
@@ -15,13 +16,17 @@ mutation(
         memberships_id: $mem_id
         countries_id: $country_id
         state: $state
-    ){
+        roles: { sync: $roles }
+    }){
         id
         first_name
         last_name
         state
         membership {
             name
+        }
+        roles{
+           name
         }
     }
 }

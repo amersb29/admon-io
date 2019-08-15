@@ -83,8 +83,9 @@
               id="apollo_roles"
               gqlQuery="roles"
               optionText="name"
-              selectedValue="4"
-              @change="onSelectChange($event, 'rol')"
+              multiple
+              :arrayModel="user.roles"
+              @change="onSelectChange($event, 'roles')"
             />
           </div>
         </div>
@@ -96,7 +97,6 @@
               <textarea rows="5" class="form-control border-input"
                         placeholder="Here can be your description"
                         v-model="user.aboutMe">
-
               </textarea>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default {
         country: "1",
         membership: null,
         state: "0",
-        rol: "4"
+        roles: [4]
       }
     };
   },
@@ -165,15 +165,11 @@ export default {
           mem_id:    this.user.membership,
           country_id: this.user.country,
           state: this.user.state,
+          roles: this.user.roles,
         },
         update: this.updateMethod
       }).then((data) => {
         this.$emit('user-created');
-        debugger
-        data.get('createUser').get('id');
-
-        log("Resultado: ",data);
-
       }).catch((error) => {
         this.$emit('user-creation-error');
       })
