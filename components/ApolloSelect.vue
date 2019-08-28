@@ -9,9 +9,6 @@
 
         <!-- Result -->
         <div v-else-if="data" class="result apollo">
-            <!-- <b-form-select v-if="arrayModel" :id="gqlQuery" class="custom-dropdown" @change="onOptionChange" multiple v-model="arrayModel">
-                <option v-for="el of data[`${gqlQuery}_combo`]" :value="el.id" :key="el.id"> {{ el[optionText] }}</option>
-            </b-form-select> -->
             <b-form-select :id="gqlQuery" class="custom-dropdown" @change="onOptionChange" :multiple="arrayModel !== undefined" v-model="selected">
                 <option v-if="selectedValue === undefined && !arrayModel" :value="null">{{ initialNullText || 'Seleccione una opción' }}</option>
                 <option v-for="el of data[`${gqlQuery}_combo`]" :value="el.id" :selected="String(el.id) === selectedValue" :key="el.id"> {{ el[optionText] }}</option>

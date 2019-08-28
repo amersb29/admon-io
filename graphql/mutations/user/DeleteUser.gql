@@ -1,0 +1,11 @@
+mutation(
+    $id: ID!
+    $roles: [ID!]!
+){
+    deleteUser( input: {
+        id: $id
+        roles: { disconnect: $roles }
+    }){
+        id
+    }
+}

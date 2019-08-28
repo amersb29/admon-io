@@ -116,9 +116,7 @@
 
 <script>
 import ApolloSelect from '../../../../components/ApolloSelect.vue';
-import createUserMut from '@/graphql/mutations/CreateUser.gql';
-
-import { log } from 'util';
+import createUserMut from '@/graphql/mutations/user/CreateUser.gql';
 
 export default {
   props: {
@@ -149,9 +147,6 @@ export default {
   },
   methods: {
     onSelectChange(e, attr) { this.user[ attr ] = e; },
-    getFlag( code ){console.log("getFlag::", require(`@/assets/img/${code}_flag.png`));
-      return require(`@/assets/img/${code}_flag.png`);
-    },
     createUser(){
       this.$apollo.mutate({
         // Query

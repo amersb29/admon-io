@@ -15,7 +15,7 @@
                 <div v-else-if="data" class="result apollo">
                     <card :title="table1.title" 
                           :actions="table1.actions" 
-                          @create-user-modal="sayHello">
+                          @create-user-modal="showCreatedUsrModal">
                         <div slot="raw-content" class="table-responsive">
                             <b-table striped hover :class="tableClass" :items="data.users" :fields="fields">
                                 <template slot="name" slot-scope="data">
@@ -33,7 +33,7 @@
                                                 class="btn-just-icon: ti-pencil">
                                     </p-button>
                                     <p-button round icon 
-                                                @click="() => alert('Borrar: ' + data.item.first_name)" 
+                                                @click="deleteUser(data.item)" 
                                                 type="danger" 
                                                 class="btn-just-icon: ti-trash">
                                     </p-button>
@@ -63,6 +63,7 @@
 <script>
 import EditProfileForm from './profile/UserProfile/EditProfileForm.vue'
 import usersList from '@/graphql/queries/users.gql';
+import deleteUserMut from '@/graphql/mutations/user/DeleteUser.gql';
 
 export default {
   components: {EditProfileForm},
@@ -109,7 +110,7 @@ export default {
     
   },
   methods: {
-    sayHello(e){
+    showCreatedUsrModal(e){
       this.$bvModal.show('create-user-modal')
     },
     userCreated(e){
@@ -145,6 +146,19 @@ export default {
         type: 'danger'
       }
       this.showNotification( options )
+    },
+    deleteUser( user ) {
+        this.$apollo.mutate({
+        // Query
+        mutation: deleteUserMut,
+        // Parameters
+        variables: { id: user.id, roles: user.roles.map( rol => rol.id ) },
+        // update: this.updateMethod
+      }).then((data) => {
+        this.$emit('user-created');
+      }).catch((error) => {
+        this.$emit('user-creation-error');
+      })
     },
     showNotification( options ) {
       this.$notify({
