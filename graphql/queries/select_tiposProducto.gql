@@ -1,0 +1,6 @@
+query{
+  tiposProducto_combo: tiposProducto {
+    id
+    description
+  }
+}
