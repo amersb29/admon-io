@@ -1,0 +1,14 @@
+query($id: ID!){
+  product(id: $id){
+    id
+    name
+    description
+    tipoProducto {
+      id
+    }
+    videos {
+      is_preview
+      vimeo_id
+    }
+  }
+}

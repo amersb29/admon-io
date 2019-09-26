@@ -9,9 +9,9 @@
 
         <!-- Result -->
         <div v-else-if="data" class="result apollo">
-            <b-form-select :id="gqlQuery" class="custom-dropdown" @change="onOptionChange" :multiple="arrayModel !== undefined" v-model="selected">
+            <b-form-select :id="gqlQuery" class="custom-dropdown mb-3" @change="onOptionChange" :multiple="arrayModel !== undefined" v-model="selected">
                 <option v-if="selectedValue === undefined && !arrayModel" :value="null">{{ initialNullText || 'Seleccione una opción' }}</option>
-                <option v-for="el of data[`${gqlQuery}_combo`]" :value="el.id" :selected="String(el.id) === selectedValue" :key="el.id"> {{ el[optionText] }}</option>
+                <option v-for="el of data[`${gqlQuery}_combo`]" :value="optionValue(el)" :selected="String(el.id) === selectedValue" :key="el.id"> {{ el[optionText] }}</option>
             </b-form-select>
         </div>
 
@@ -29,7 +29,8 @@ export default {
         optionText: String,
         initialNullText: String,
         model: String,
-        arrayModel: Array
+        arrayModel: Array,
+        filter: Boolean
     },
     computed: {
         selected: {
@@ -44,7 +45,7 @@ export default {
             set: function ( val ) {
                 this.optSelected = val
             }
-        }
+        },
     },
     data() {
         return {
@@ -54,6 +55,9 @@ export default {
     methods: {
         onOptionChange( $event ){
             this.$emit('change', $event);
+        },
+        optionValue(el) {
+            return this.filter ? el.description : el.id ;
         }
     }
 }

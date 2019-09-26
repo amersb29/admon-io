@@ -1,7 +1,8 @@
 <template>
     <b-row>
-        <b-col sm="8">
-        <ApolloQuery :query="require('@/graphql/queries/productos/productos.gql')">
+        <b-col>
+        <ApolloQuery :query="require('@/graphql/queries/productos/productos.gql')"
+                     @result="updateTotalRows($event.data.products ? $event.data.products.length : 0)">
             <template v-slot="{ result: { loading, error, data } }">
                 <!-- Loading -->
                 <div v-if="loading" class="loading apollo">Loading...</div>
@@ -11,43 +12,153 @@
 
                 <!-- Result -->
                 <div v-else-if="data" class="result apollo">
-                    <card :title="table.title" 
-                          :actions="table.actions">
-                        <div slot="raw-content" class="table-responsive">
-                            <b-table striped hover 
-                                    :class="tableClass" 
-                                    :items="data.products" 
-                                    :fields="fields" 
-                                    :filter="filter"
-                                    :current-page="currentPage"
-                                    :per-page="perPage">
-                                <template slot="name" slot-scope="data">
-                                    {{ data.item.name }}
-                                </template>
-                                <template slot="categoria" slot-scope="data">
-                                    {{ data.item.tipoProducto.description }}
-                                </template>
-                                <template slot="acciones" slot-scope="data">
-                                    <p-button round icon
-                                                @click="function(){ alert('Hola' + data.item.id)}" 
-                                                type="primary" 
-                                                class="btn-just-icon: ti-pencil">
-                                    </p-button>
-                                    <p-button round icon 
-                                                @click="function(){ alert('Hola')}" 
-                                                type="danger" 
-                                                class="btn-just-icon: ti-trash">
-                                    </p-button>
-                                </template>
-                            </b-table>
-                            <b-pagination v-model="currentPage"
-                                        :total-rows="95"
-                                        :per-page="perPage"
-                                        align="fill"
-                                        size="sm"
-                                        ></b-pagination>
-                        </div>
-                    </card>
+                    <b-row class="mb-3">
+                        <b-col sm="6">
+                            <b-button v-b-toggle.collapse-1 variant="primary" size="sm">Filtros</b-button>
+                            <b-collapse id="collapse-1" class="mt-2">
+                                <b-card>
+                                    <b-tabs content-class="mt-3">
+                                        <b-tab title="Categoría" active>
+                                            <apollo-select
+                                                @change="onSelectChange($event)"
+                                                filter
+                                                gqlQuery="tiposProducto"
+                                                id="tpProducto_filter" 
+                                                initialNullText="Todas"
+                                                optionText="description"/>
+                                        </b-tab>
+                                        <b-tab title="Nombre">
+                                            <b-form-input @change="onSelectChange($event)" 
+                                                          id="name_filter"
+                                                          placeholder="Escriba el nombre del producto" 
+                                                          type="text">
+                                            </b-form-input>
+                                        </b-tab>
+                                    </b-tabs>
+                                </b-card>
+                            </b-collapse>
+                        </b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col md="8">
+                        <card :title="table.title">
+                            <div slot="raw-content" class="table-responsive">
+                                <b-pagination v-model="currentPage"
+                                            :total-rows="totalRows"
+                                            :per-page="perPage"
+                                            align="center"
+                                            size="sm"
+                                            ></b-pagination>
+                                <b-table striped hover 
+                                        :class="tableClass" 
+                                        :items="data.products" 
+                                        :fields="fields" 
+                                        :filter="filter"
+                                        @filtered="updateTotalRows(($event.length || 0))"
+                                        :current-page="currentPage"
+                                        :per-page="perPage">
+                                    <template slot="name" slot-scope="data">
+                                        {{ data.item.name }}
+                                    </template>
+                                    <template slot="categoria" slot-scope="data">
+                                        {{ data.item.tipoProducto.description }}
+                                    </template>
+                                    <template slot="acciones" slot-scope="data">
+                                        <div class="form-buttons-section">
+                                            <b-button class="btn-just-icon: ti-pencil" 
+                                                    @click="editProduct($event, data.item.id)"
+                                                    variant="primary"
+                                                    pill>
+                                                <i ></i>
+                                            </b-button>
+                                            <b-button class="btn-just-icon: ti-trash"
+                                                    variant="danger"
+                                                    pill>
+                                            </b-button>
+                                        </div>
+                                    </template> 
+                                </b-table>
+                                <b-pagination v-model="currentPage"
+                                            :total-rows="totalRows"
+                                            :per-page="perPage"
+                                            align="center"
+                                            size="sm"
+                                            ></b-pagination>
+                            </div>
+                        </card>
+                        </b-col>
+                        <b-col sm="4">
+                            <div class="form-section">
+                            <b-tabs align="center">
+                                <b-tab title="Información del Producto">
+                                    <b-card class="form-card">
+                                    <b-form>
+                                    <b-form-group label="Tipo de Producto" label-for="tpProducto">
+                                        <apollo-select
+                                            @change="onTpProducto($event)"
+                                            gqlQuery="tiposProducto"
+                                            id="tpProducto" 
+                                            :selectedValue="selValue"
+                                            optionText="description"/>
+                                    </b-form-group>
+                                    <b-form-group label="Nombre del Producto" label-for="nombre_producto">
+                                        <b-input id="nombre_producto" 
+                                                 placeholder="Escriba el nombre del producto"
+                                                 required
+                                                 v-model="product.name"></b-input>
+                                    </b-form-group>
+                                    <b-form-group label="Descripción del Producto" label-for="desc_producto">
+                                        <b-form-textarea id="desc_producto" 
+                                                            placeholder="Escriba la descripción del producto"
+                                                            required
+                                                            rows="10"
+                                                            v-model="product.description">
+                                        </b-form-textarea>
+                                    </b-form-group>
+                                    <b-form-group label="Imagen del producto" label-for="img_producto">
+                                        <b-form-file
+                                            accept=".jpg, .png, .gif"
+                                            id="img_producto"
+                                            v-model="product.image"
+                                            placeholder="Seleccione la imagen del producto..."
+                                            required
+                                            drop-placeholder="Drop file here..."
+                                            ></b-form-file>
+                                    </b-form-group>
+                                    </b-form>
+                                    </b-card>
+                                </b-tab>
+                                <b-tab title="Videos del Producto">
+                                    <b-card class="form-card">
+                                    <b-form>
+                                        <b-form-group label="Preview" label-for="preview">
+                                            <b-input id="preview" required v-model="product.videos.preview"></b-input>
+                                        </b-form-group>
+                                        <b-form-group label="Video 1" label-for="video1">
+                                            <b-input id="video1" v-model="product.videos.video1"></b-input>
+                                        </b-form-group>
+                                        <b-form-group label="Video 2" label-for="video2">
+                                            <b-input id="video2" v-model="product.videos.video2"></b-input>
+                                        </b-form-group>
+                                        <b-form-group label="Video 3" label-for="video3">
+                                            <b-input id="video3" v-model="product.videos.video3"></b-input>
+                                        </b-form-group>
+                                        <b-form-group label="Video 4" label-for="video4">
+                                            <b-input id="video4" v-model="product.videos.video4"></b-input>
+                                        </b-form-group>
+
+                                        <div class="form-buttons-section">
+                                            <b-button type="reset" variant="danger">Reiniciar</b-button>
+                                            <b-button type="submit" variant="primary">Guardar</b-button>
+                                        </div>
+                                        
+                                    </b-form>
+                                    </b-card>
+                                </b-tab>
+                            </b-tabs>
+                            </div>
+                        </b-col>
+                    </b-row>
                 </div>
 
                 <!-- No result -->
@@ -55,22 +166,13 @@
             </template>
         </ApolloQuery>
         </b-col>
-        <b-col sm="4">
-            <b-card title="Filtros" style="max-width: 20rem;">
-                <label for="apollo_tpProducto">Categoría</label>
-                <apollo-select
-                    v-model="filter"
-                    id="apollo_tpProducto"
-                    gqlQuery="tiposProducto" 
-                    optionText="description"
-                    @change="onSelectChange($event)"/>
-            </b-card>
-        </b-col>
+        
     </b-row>
 </template>
 
 <script>
 import ApolloSelect from '../../components/ApolloSelect.vue';
+import edit_products from '@/graphql/queries/productos/edit_productos.gql';
 
 export default {
     layout: 'dashboard/DashboardLayout',
@@ -79,6 +181,19 @@ export default {
     },
     data() {
         return {
+            product: {
+                tpProducto: 0,
+                name: '',
+                description: '',
+                image: '',
+                videos: {
+                    preview: '',
+                    video1: '',
+                    video2: '',
+                    video3: '',
+                    video4: '',
+                }
+            },
             fields: [
                 {
                     key: 'id',
@@ -105,12 +220,33 @@ export default {
                 actions: [{name: 'Añadir Producto', icon: 'plus-square', eventName: 'create-user-modal'  }]
             },
             currentPage: 1,
-            perPage: 5,
             filter: null,
+            perPage: 15,
+            totalRows: 0,
+            selValue: "1"
         }
     },
     methods: {
-      onSelectChange(e, attr) { this.filter = e; console.log(e); },
+      onSelectChange(e) { this.filter = e && e.target ? e.target.value : e },
+      updateTotalRows(length) { this.totalRows = length },
+      onTpProducto(e) { this.product.tpProducto = e },
+      async editProduct(e, idx) {
+          const res = await this.$apollo.query({
+              query: edit_products,
+              variables: {
+                  id: idx
+              }
+          })
+
+          this.product.name = res.data.product.name;
+        //   this.selValue = `${res.data.product.tipoProducto.id}`;
+          this.product.description = res.data.product.description;
+          this.product.videos.preview = res.data.product.videos[0] ? res.data.product.videos[0].vimeo_id : null ;
+          this.product.videos.video1 = res.data.product.videos[1] ? res.data.product.videos[1].vimeo_id : null ;
+          this.product.videos.video2 = res.data.product.videos[2] ? res.data.product.videos[2].vimeo_id : null ;
+          this.product.videos.video3 = res.data.product.videos[3] ? res.data.product.videos[3].vimeo_id : null ;
+          this.product.videos.video4 = res.data.product.videos[4] ? res.data.product.videos[4].vimeo_id : null ;
+      }
     },
     computed: {
         tableClass() {
@@ -121,5 +257,15 @@ export default {
 </script>
 
 <style>
-
+.form-buttons-section {
+    display: flex; 
+    justify-content: space-evenly; 
+    margin-top: 50px;
+}
+.form-card {
+    height: 550px;
+}
+.form-section {
+    background-color: white;
+}
 </style>
