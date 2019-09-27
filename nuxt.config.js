@@ -62,7 +62,7 @@ export default {
   */
  // Give apollo module options
   apollo: {
-    tokenName: 'yourApolloTokenName', // optional, default: apollo-token
+    tokenName: 'apollo-token', // optional, default: apollo-token
     cookieAttributes: {
       /**
         * Define when the cookie will be removed. Value can be a Number
@@ -88,7 +88,7 @@ export default {
       secure: false,
     },
     // includeNodeModules: true, // optional, default: false (this includes graphql-tag for node_modules folder)
-    authenticationType: 'Basic', // optional, default: 'Bearer'
+    authenticationType: 'Bearer', // optional, default: 'Bearer'
     // (Optional) Default 'apollo' definition
     defaultOptions: {
       // See 'apollo' definition
