@@ -2,7 +2,7 @@
     <b-row>
         <b-col>
         <ApolloQuery :query="require('@/graphql/queries/productos/productos.gql')"
-                     @result="updateTotalRows($event.data.products ? $event.data.products.length : 0)">
+                     @result="updateTotalRows($event.data && $event.data.products ? $event.data.products.length : 0)">
             <template v-slot="{ result: { loading, error, data } }">
                 <!-- Loading -->
                 <div v-if="loading" class="loading apollo">Loading...</div>
@@ -40,7 +40,7 @@
                         </b-col>
                     </b-row>
                     <b-row>
-                        <b-col md="8">
+                        <b-col md="7">
                         <card :title="table.title">
                             <div slot="raw-content" class="table-responsive">
                                 <b-pagination v-model="currentPage"
@@ -66,7 +66,7 @@
                                     <template slot="acciones" slot-scope="data">
                                         <div class="form-buttons-section">
                                             <b-button class="btn-just-icon: ti-pencil" 
-                                                    @click="editProduct($event, data.item.id)"
+                                                    @click="fillProductForm($event, data.item.id)"
                                                     variant="primary"
                                                     pill>
                                                 <i ></i>
@@ -87,7 +87,7 @@
                             </div>
                         </card>
                         </b-col>
-                        <b-col sm="4">
+                        <b-col sm="5">
                             <div class="form-section">
                             <b-tabs align="center">
                                 <b-tab title="Información del Producto">
@@ -97,7 +97,7 @@
                                         <apollo-select
                                             @change="onTpProducto($event)"
                                             gqlQuery="tiposProducto"
-                                            id="tpProducto" 
+                                            ref="tpProducto" 
                                             :selectedValue="selValue"
                                             optionText="description"/>
                                     </b-form-group>
@@ -146,15 +146,13 @@
                                         <b-form-group label="Video 4" label-for="video4">
                                             <b-input id="video4" v-model="product.videos.video4"></b-input>
                                         </b-form-group>
-
-                                        <div class="form-buttons-section">
-                                            <b-button type="reset" variant="danger">Reiniciar</b-button>
-                                            <b-button type="submit" variant="primary">Guardar</b-button>
-                                        </div>
-                                        
                                     </b-form>
                                     </b-card>
                                 </b-tab>
+                                <div class="form-buttons-section">
+                                    <b-button type="reset" variant="danger" @click="resetForm()">Reiniciar</b-button>
+                                    <b-button type="submit" variant="primary">Guardar</b-button>
+                                </div>
                             </b-tabs>
                             </div>
                         </b-col>
@@ -176,12 +174,15 @@ import edit_products from '@/graphql/queries/productos/edit_productos.gql';
 
 export default {
     layout: 'dashboard/DashboardLayout',
+    created(){
+        this.resetForm();
+    },
     components: {
         ApolloSelect
     },
     data() {
         return {
-            product: {
+            emptyProduct: {
                 tpProducto: 0,
                 name: '',
                 description: '',
@@ -194,6 +195,7 @@ export default {
                     video4: '',
                 }
             },
+            product: null,
             fields: [
                 {
                     key: 'id',
@@ -227,10 +229,9 @@ export default {
         }
     },
     methods: {
-      onSelectChange(e) { this.filter = e && e.target ? e.target.value : e },
-      updateTotalRows(length) { this.totalRows = length },
-      onTpProducto(e) { this.product.tpProducto = e },
-      async editProduct(e, idx) {
+      async fillProductForm(e, idx) {
+          this.resetForm();
+
           const res = await this.$apollo.query({
               query: edit_products,
               variables: {
@@ -238,15 +239,24 @@ export default {
               }
           })
 
+          this.$refs.tpProducto.optSelected = res.data.product.tipoProducto.id;
+
           this.product.name = res.data.product.name;
-        //   this.selValue = `${res.data.product.tipoProducto.id}`;
+          this.product.tpProducto = res.data.product.tipoProducto.id;
           this.product.description = res.data.product.description;
-          this.product.videos.preview = res.data.product.videos[0] ? res.data.product.videos[0].vimeo_id : null ;
-          this.product.videos.video1 = res.data.product.videos[1] ? res.data.product.videos[1].vimeo_id : null ;
-          this.product.videos.video2 = res.data.product.videos[2] ? res.data.product.videos[2].vimeo_id : null ;
-          this.product.videos.video3 = res.data.product.videos[3] ? res.data.product.videos[3].vimeo_id : null ;
-          this.product.videos.video4 = res.data.product.videos[4] ? res.data.product.videos[4].vimeo_id : null ;
-      }
+
+          res.data.product.videos.forEach( (video, index) => {
+              let name = video.is_preview ? 'preview' : `video${index}` ;
+              this.product.videos[ name ] = video ? video.vimeo_id : null ;
+          });
+      },
+      onSelectChange(e) { this.filter = e && e.target ? e.target.value : e },
+      onTpProducto(e) { this.product.tpProducto = e },
+      resetForm(){ 
+          this.product = Object.assign({}, this.emptyProduct) 
+          this.product.videos = Object.assign({}, this.emptyProduct.videos) 
+      },
+      updateTotalRows(length) { this.totalRows = length },
     },
     computed: {
         tableClass() {
@@ -259,8 +269,7 @@ export default {
 <style>
 .form-buttons-section {
     display: flex; 
-    justify-content: space-evenly; 
-    margin-top: 50px;
+    justify-content: space-evenly;
 }
 .form-card {
     height: 550px;

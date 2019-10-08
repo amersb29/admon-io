@@ -3,6 +3,7 @@ query{
     id
     name
     tipoProducto {
+      id
       description
     }
   }
