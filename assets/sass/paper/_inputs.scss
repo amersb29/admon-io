@@ -15,9 +15,13 @@
 }
 
 .form-control {
-  background-color: $gray-input-bg;
-  border: medium none;
-  border-radius: $border-radius-base;
+  // background-color: $gray-input-bg;
+  // border: medium none;
+  background-color: $white-background-color;
+  border: 0;
+  border-bottom: 1px dotted $black-hr;
+  border-radius: 0;
+  // border-radius: $border-radius-base;
   color: $font-color;
   font-size: $font-size-base;
   transition: background-color 0.3s ease 0s;
