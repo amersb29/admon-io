@@ -1,13 +1,10 @@
 <template>
   <div class="container">
-    <b-card :img-src="logo"
-            img-alt="InteligenciaObjetiva"
-            img-top
-            style="max-width: 315px">
+    <b-card style="max-width: 315px">
       <template v-slot:header>
         <h3 class="mb-0">InteligenciaObjetiva</h3>
       </template>
-      <b-form>
+      <b-form novalidate ref="loginForm" @submit.prevent="login($event)">
         <b-input-group>
           <b-input-group-prepend class="prepend">
             <i class="fa fa-envelope"></i>
@@ -16,6 +13,9 @@
                     type="email"  
                     v-model="loginObj.username"
                     placeholder="Escriba su correo electrónico"></b-input>
+          <div class="invalid-feedback">
+            Escriba su correo electr&oacute;nico.
+          </div>
         </b-input-group>
         <b-input-group>
           <b-input-group-prepend class="prepend">
@@ -25,13 +25,16 @@
                     type="password"
                     v-model="loginObj.password"
                     placeholder="Escriba su contraseña"></b-input>
+          <div class="invalid-feedback">
+            Escriba su contrase&ntilde;a.
+          </div>
         </b-input-group>
         <div class="errorContainer">
-          <span class="errorTxt">
-            
+          <span class="errorTxt" v-for="(err, idx) of errorsArr" :key="idx">
+            {{ err.message }}
           </span>
         </div>
-        <b-button variant="primary" @click="login()">Entrar</b-button>
+        <b-button variant="primary" type="submit">Entrar</b-button>
         <b-button variant="danger">Olvid&eacute; mi contrase&ntilde;a</b-button>
       </b-form>
     </b-card>
@@ -44,6 +47,7 @@ import loginMut from '@/graphql/mutations/login/Login.gql';
 export default {
   data() {
     return {
+      errorsArr: [],
       loginObj: {
         username: '',
         password: ''
@@ -57,20 +61,28 @@ export default {
     logo: () => 'https://adamdehaven.com/wp-content/uploads/key.jpg' //require("@/assets/img/logo.png")
   },
   methods: {
-    login() {
-      this.$apollo.mutate({
-        mutation: loginMut,
-        variables: { username: this.loginObj.username, password: this.loginObj.password}
-      }).then( ( {data: { login = null } } = res) => {
-        if(login){
-          localStorage.setItem('token', login.access_token)
-          localStorage.setItem('user.id', login.user.id)
-          localStorage.setItem('user.first_name', login.user.first_name)
-          localStorage.setItem('user.email', login.user.email)
-        }
-      }).catch( error => {
-        console.log(error)
-      });
+    login( event ) {
+      const form = this.$refs.loginForm
+
+      if (form.checkValidity() === false) {
+          event.stopPropagation();
+      }else{
+        this.$apollo.mutate({
+          mutation: loginMut,
+          variables: { username: this.loginObj.username, password: this.loginObj.password}
+        }).then( ( {data: { login = null } } = res) => {
+          if(login){
+            localStorage.setItem('token', login.access_token)
+            localStorage.setItem('user.id', login.user.id)
+            localStorage.setItem('user.first_name', login.user.first_name)
+            localStorage.setItem('user.email', login.user.email)
+          }
+        }).catch( error => {
+          this.errorsArr = error.graphQLErrors
+        });
+      }
+
+      form.classList.add('was-validated');
     }
   }
 }
@@ -96,6 +108,10 @@ body {
 }
 .errorTxt {
   color: #B33C12;
+}
+
+.invalid-feedback {
+  text-align: center;
 }
 
 .prepend {
