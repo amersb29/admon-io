@@ -33,6 +33,7 @@ export default {
     '~/plugins/globalDirectives',
     '~/plugins/paperDashboard',
     '~/plugins/SidebarPlugin/index',
+    '~/plugins/eliminar-acentos',
   ],
   /*
   ** Nuxt.js modules
@@ -113,8 +114,9 @@ export default {
         // You can use `wss` for secure connection (recommended in production)
         // Use `null` to disable subscriptions
         // wsEndpoint: 'ws://localhost:4000', // optional
+        wsEndpoint: null,
         // LocalStorage token
-        // tokenName: 'apollo-token', // optional
+        tokenName: 'apollo-token', // optional
         // Enable Automatic Query persisting with Apollo Engine
         persisting: true, // Optional
         // Use websockets for everything (no HTTP)
@@ -124,7 +126,7 @@ export default {
       test: {
         httpEndpoint: 'http://membresias-io.test/graphql',
         // wsEndpoint: 'ws://localhost:5000',
-        // tokenName: 'apollo-token'
+        tokenName: 'apollo-token'
       },
       // alternative: user path to config which returns exact same config options
       // test2: '~/plugins/my-alternative-apollo-config.js'

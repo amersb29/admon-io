@@ -5,9 +5,8 @@
       <template slot="links">
         <sidebar-link to="/dashboard" name="Dashboard" icon="ti-panel"/>
         <sidebar-link to="/usuarios" name="Usuarios" icon="ti-user"/>
-        <sidebar-link to="/roles" name="Roles" icon="ti-shield"/>
-        <sidebar-link to="/membresias" name="Membresías" icon="ti-medall-alt"/>
         <sidebar-link to="/productos" name="Productos" icon="ti-package"/>
+        <sidebar-link to="/catalogos" name="Catálogos" icon="ti-medall-alt"/>
         <sidebar-link to="/notifications" name="Notifications" icon="ti-bell"/>
       </template>
       <mobile-menu>

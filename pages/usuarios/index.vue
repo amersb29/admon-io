@@ -2,8 +2,8 @@
     <div class="row">
       <div class="col-12">
         <ApolloQuery
-            :query="require('@/graphql/queries/users.gql')"
-        >
+            :query="require('@/graphql/queries/users.gql')" 
+            :context="this.apolloContext">
             <template v-slot="{ result: { loading, error, data } }">
                 <!-- Loading -->
                 <div v-if="loading" class="loading apollo">Loading...</div>
@@ -61,9 +61,11 @@
 </template>
 
 <script>
-import EditProfileForm from './profile/UserProfile/EditProfileForm.vue'
+import { setContext } from "apollo-link-context";
 import usersList from '@/graphql/queries/users.gql';
 import deleteUserMut from '@/graphql/mutations/user/DeleteUser.gql';
+
+import EditProfileForm from './profile/UserProfile/EditProfileForm.vue'
 
 export default {
   components: {EditProfileForm},
@@ -107,7 +109,11 @@ export default {
     tableClass() {
       return `table-striped`;
     },
-    
+    apolloContext() {
+      return setContext((request, previousContext) => ({
+                headers: {Authorization: `Bearer ${localStorage.getItem('apollo-token')}`}
+              }));
+    }
   },
   methods: {
     showCreatedUsrModal(e){

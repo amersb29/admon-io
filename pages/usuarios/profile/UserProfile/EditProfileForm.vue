@@ -1,20 +1,21 @@
 <template>
   <card class="card" :title="formTitle">
     <div>
-      <form>
+      <form ref="createUsrForm">
         <div class="row">
           <div class="col-md-6">
             <fg-input type="text"
-                      label="First Name"
-                      placeholder="First Name"
+                      label="Nombre"
+                      placeholder="Escriba el Nombre"
                       required
                       v-model="user.firstName">
             </fg-input>
           </div>
           <div class="col-md-6">
             <fg-input type="text"
-                      label="Last Name"
-                      placeholder="Last Name"
+                      label="Apellido(s)"
+                      placeholder="Escriba el/los Apellido(s)"
+                      required
                       v-model="user.lastName">
             </fg-input>
           </div>
@@ -23,8 +24,9 @@
         <div class="row">
           <div class="col-md-12">
             <fg-input type="email"
-                      label="Email"
-                      placeholder="Email"
+                      label="Correo electrónico"
+                      placeholder="Escriba el Correo electrónico"
+                      required
                       v-model="user.email">
             </fg-input>
           </div>
@@ -34,14 +36,16 @@
           <div class="col-md-6">
             <fg-input type="password"
                       label="Contraseña"
-                      placeholder="Contraseña"
+                      placeholder="Escriba la Contraseña"
+                      required
                       v-model="user.password">
             </fg-input>
           </div>
           <div class="col-md-6">
             <fg-input type="password"
                       label="Confirmar Contraseña"
-                      placeholder="Confirmar Contraseña">
+                      placeholder="Confirmar Contraseña"
+                      required>
             </fg-input>
           </div>
         </div>
@@ -148,26 +152,33 @@ export default {
   methods: {
     onSelectChange(e, attr) { this.user[ attr ] = e; },
     createUser(){
-      this.$apollo.mutate({
-        // Query
-        mutation: createUserMut,
-        // Parameters
-        variables: {
-          firstName: this.user.firstName,
-          lastName:  this.user.lastName,
-          email:     this.user.email,
-          password:  this.user.password,
-          mem_id:    this.user.membership,
-          country_id: this.user.country,
-          state: this.user.state,
-          roles: this.user.roles,
-        },
-        update: this.updateMethod
-      }).then((data) => {
-        this.$emit('user-created');
-      }).catch((error) => {
-        this.$emit('user-creation-error');
-      })
+      const form = this.$refs.createUsrForm;
+
+      if (form.checkValidity() === false) {
+          event.stopPropagation();
+      }else {
+        this.$apollo.mutate({
+          // Query
+          mutation: createUserMut,
+          // Parameters
+          variables: {
+            firstName: this.user.firstName,
+            lastName:  this.user.lastName,
+            email:     this.user.email,
+            password:  this.user.password,
+            mem_id:    this.user.membership,
+            country_id: this.user.country,
+            state: this.user.state,
+            roles: this.user.roles,
+          },
+          update: this.updateMethod
+        }).then((data) => {
+          this.$emit('user-created');
+        }).catch((error) => {
+          this.$emit('user-creation-error');
+        })
+      }
+      form.classList.add('was-validated');
     },
 
   }

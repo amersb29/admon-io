@@ -91,7 +91,7 @@
                             <div class="form-section">
                             <b-tabs align="center">
                                 <b-tab title="Información del Producto">
-                                    <b-card class="form-card">
+                                    <div class="tab-form">
                                     <b-form>
                                     <b-form-group label="Tipo de Producto" label-for="tpProducto">
                                         <apollo-select
@@ -126,10 +126,10 @@
                                             ></b-form-file>
                                     </b-form-group>
                                     </b-form>
-                                    </b-card>
+                                    </div>
                                 </b-tab>
                                 <b-tab title="Videos del Producto">
-                                    <b-card class="form-card">
+                                    <div class="tab-form">
                                     <b-form>
                                         <b-form-group label="Preview" label-for="preview">
                                             <b-input id="preview" required v-model="product.videos.preview"></b-input>
@@ -147,9 +147,9 @@
                                             <b-input id="video4" v-model="product.videos.video4"></b-input>
                                         </b-form-group>
                                     </b-form>
-                                    </b-card>
+                                    </div>
                                 </b-tab>
-                                <div class="form-buttons-section">
+                                <div class="tab-form-buttons-section">
                                     <b-button type="reset" variant="danger" @click="resetForm()">Reiniciar</b-button>
                                     <b-button type="submit" variant="primary">Guardar</b-button>
                                 </div>
@@ -230,31 +230,35 @@ export default {
     },
     methods: {
       async fillProductForm(e, idx) {
-          this.resetForm();
+        this.resetForm();
 
-          const res = await this.$apollo.query({
-              query: edit_products,
-              variables: {
-                  id: idx
-              }
-          })
+        const res = await this.$apollo.query({
+            query: edit_products,
+            variables: {
+                id: idx
+            }
+        })
 
-          this.$refs.tpProducto.optSelected = res.data.product.tipoProducto.id;
+        let { tipoProducto, name, description, videos } = res.data.product
 
-          this.product.name = res.data.product.name;
-          this.product.tpProducto = res.data.product.tipoProducto.id;
-          this.product.description = res.data.product.description;
+        this.$refs.tpProducto.optSelected = tipoProducto.id
 
-          res.data.product.videos.forEach( (video, index) => {
-              let name = video.is_preview ? 'preview' : `video${index}` ;
-              this.product.videos[ name ] = video ? video.vimeo_id : null ;
-          });
+        this.product.name = name
+        this.product.tpProducto = tipoProducto.id
+        this.product.description = description
+
+        videos.forEach( (video, index) => {
+            let name = video.is_preview ? 'preview' : `video${index}` 
+            this.product.videos[ name ] = video ? video.vimeo_id : null 
+        });
       },
       onSelectChange(e) { this.filter = e && e.target ? e.target.value : e },
       onTpProducto(e) { this.product.tpProducto = e },
       resetForm(){ 
           this.product = Object.assign({}, this.emptyProduct) 
           this.product.videos = Object.assign({}, this.emptyProduct.videos) 
+          if(this.$refs.tpProducto) 
+            this.$refs.tpProducto.optSelected = 1
       },
       updateTotalRows(length) { this.totalRows = length },
     },
@@ -271,8 +275,14 @@ export default {
     display: flex; 
     justify-content: space-evenly;
 }
-.form-card {
+.tab-form-buttons-section {
+    display: flex; 
+    justify-content: space-evenly;
+    margin: 35px;
+}
+.tab-form {
     height: 550px;
+    padding: 30px;
 }
 .form-section {
     background-color: white;

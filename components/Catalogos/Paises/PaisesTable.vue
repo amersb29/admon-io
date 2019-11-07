@@ -1,10 +1,12 @@
 <template>
-    <div>Roles</div>
+   <div>
+       Países Table
+   </div>
 </template>
 
 <script>
 export default {
-    layout: 'dashboard/DashboardLayout',
+   name: 'paises-table'
 }
 </script>
 

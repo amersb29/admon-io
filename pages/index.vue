@@ -61,25 +61,28 @@ export default {
     logo: () => 'https://adamdehaven.com/wp-content/uploads/key.jpg' //require("@/assets/img/logo.png")
   },
   methods: {
-    login( event ) {
+    async login( event ) {
       const form = this.$refs.loginForm
 
       if (form.checkValidity() === false) {
           event.stopPropagation();
       }else{
-        this.$apollo.mutate({
-          mutation: loginMut,
-          variables: { username: this.loginObj.username, password: this.loginObj.password}
-        }).then( ( {data: { login = null } } = res) => {
-          if(login){
-            localStorage.setItem('token', login.access_token)
-            localStorage.setItem('user.id', login.user.id)
-            localStorage.setItem('user.first_name', login.user.first_name)
-            localStorage.setItem('user.email', login.user.email)
-          }
-        }).catch( error => {
+        try {
+          const res = await this.$apollo.mutate({
+            mutation: loginMut,
+            variables: { username: this.loginObj.username, password: this.loginObj.password}
+          }).then( ( {data: { login = null } } = res) => login )
+
+          localStorage.setItem('apollo-token', res.access_token)
+          localStorage.setItem('user.id', res.user.id)
+          localStorage.setItem('user.first_name', res.user.first_name)
+          localStorage.setItem('user.email', res.user.email)
+          
+          this.$router.replace({ path: 'dashboard' })
+
+        } catch (error) {
           this.errorsArr = error.graphQLErrors
-        });
+        }
       }
 
       form.classList.add('was-validated');
