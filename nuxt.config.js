@@ -34,6 +34,7 @@ export default {
     '~/plugins/paperDashboard',
     '~/plugins/SidebarPlugin/index',
     '~/plugins/eliminar-acentos',
+    '~/plugins/accounting.js',
   ],
   /*
   ** Nuxt.js modules

@@ -1,0 +1,10 @@
+mutation(
+    $name: String!
+    $price: Float!
+){
+    res: createMembership(name: $name, price: $price){
+        id
+        name
+        price
+    }
+}

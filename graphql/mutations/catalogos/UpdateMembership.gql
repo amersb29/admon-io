@@ -1,0 +1,11 @@
+mutation(
+    $id: ID!
+    $name: String!
+    $price: Float!
+){
+    res: updateMembership(id: $id, name: $name, price: $price){
+        id
+        name
+        price
+    }
+}

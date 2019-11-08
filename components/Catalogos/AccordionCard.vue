@@ -10,12 +10,8 @@
               <b-col>
                 <component :is="table | eliminarAcentos"></component>
               </b-col>
-              <b-col>
-                <component :is="form | eliminarAcentos"></component>
-              </b-col>
-            </b-row>
+            </b-row>            
           </b-container>
-            
         </b-card-body>
       </b-collapse>
     </b-card>
@@ -34,6 +30,7 @@ import MetodosDePagoTable from "./MetodosDePago/MetodosDePagoTable";
 import MetodosDePagoForm from "./MetodosDePago/MetodosDePagoForm";
 
 export default {
+    name: 'accordion-card',
     components: {
         MembresiasTable, MembresiasForm,
         PaisesTable, PaisesForm,

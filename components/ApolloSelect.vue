@@ -1,5 +1,5 @@
 <template>
-    <ApolloQuery :query="require( `@/graphql/queries/select_${gqlQuery}.gql` )">
+    <ApolloQuery :query="require( `@/graphql/queries/dropdown/select_${gqlQuery}.gql` )">
         <template v-slot="{ result: { loading, error, data } }">
         <!-- Loading -->
         <div v-if="loading" class="loading apollo">Loading...</div>
