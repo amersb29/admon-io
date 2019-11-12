@@ -27,43 +27,13 @@
                                         v-model="selectedItem.id"/>
 
                                 <b-input class="form-control" 
-                                        id="name"
-                                        name="name" 
-                                        :placeholder="`Nombre ${getPlaceholder(field)}`"
-                                        ref="name"
+                                        :id="field.key"
+                                        :name="field.key" 
+                                        :placeholder="`${getPlaceholder(field)}`"
+                                        :ref="field.key"
                                         type="text"
-                                        v-if="field.key === 'name'"
-                                        v-model="selectedItem.name"/>
-
-                                <b-input class="form-control"
-                                        id="price"
-                                        name="price"
-                                        :placeholder="`Precio ${getPlaceholder(field)}`"
-                                        ref="price"
-                                        style="width: 225px"
-                                        type="text"
-                                        v-if="field.key === 'price'"
-                                        v-model="formatedPrice"/>
-                                
-                                <b-input class="form-control"
-                                        id="description"
-                                        name="description"
-                                        :placeholder="`Descrición ${getPlaceholder(field)}`"
-                                        ref="description"
-                                        style="width: 225px"
-                                        type="text"
-                                        v-if="field.key === 'description'"
-                                        v-model="selectedItem.description"/>
-
-                                <b-input class="form-control"
-                                        id="code"
-                                        name="code"
-                                        :placeholder="`Código ${getPlaceholder(field)}`"
-                                        ref="code"
-                                        style="width: 225px"
-                                        type="text"
-                                        v-if="field.key === 'code'"
-                                        v-model="selectedItem.code"/>
+                                        v-if="field.key !== 'id' && field.key !== 'acciones'"
+                                        v-model="selectedItem[field.key]"/>
 
                                 <div v-if="field.key === 'acciones'" class="buttonsContainer">
                                     <b-button :variant="buttonVariant" 
@@ -136,6 +106,8 @@
 import accounting from 'accounting'
 import actions from '@/enums/actions'
 import catalogos from '@/enums/catalogos'
+import propiedades from '@/enums/propiedades'
+
 
 export default {
     name: 'apollo-crud',
@@ -233,7 +205,7 @@ export default {
             return mensaje.replace('#', genero);
         },
         getPlaceholder(field) {
-            let placeholder = `de ${this.catalogo.articulo_singular.toLowerCase()} ${this.catalogo.singular.charAt(0).toUpperCase() + this.catalogo.singular.slice(1)}`
+            let placeholder = `${propiedades[field.key]} de ${this.catalogo.articulo_singular.toLowerCase()} ${this.catalogo.singular.charAt(0).toUpperCase() + this.catalogo.singular.slice(1)}`
             return placeholder.replace('de el', 'del')
         },
         getQuery(){debugger 
@@ -245,10 +217,6 @@ export default {
            switch (this.currentAction) {
               case actions.CREATE:
                   delete baseVariablesObj.id
-                  break
-              case actions.DELETE:
-                  delete baseVariablesObj.name
-                  delete baseVariablesObj.price
                   break
           }  
 
@@ -272,7 +240,6 @@ export default {
 
             if(this.currentAction === actions.DELETE){
                 let index = data[this.catalogo.id].findIndex( obj => obj.id === res.id )
-                console.log(index)
                 data[this.catalogo.id].splice(index, 1)
             }
 
