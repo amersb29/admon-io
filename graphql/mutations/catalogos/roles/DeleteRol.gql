@@ -1,0 +1,5 @@
+mutation($id: ID!){
+    res: deleteRole(id: $id){
+        id
+    }
+}

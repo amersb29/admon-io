@@ -1,0 +1,9 @@
+mutation(
+    $id: ID!
+    $description: String!
+){
+    res: updateTipoProducto(id: $id, description: $description){
+        id
+        description
+    }
+}

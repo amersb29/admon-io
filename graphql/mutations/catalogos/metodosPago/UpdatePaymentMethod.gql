@@ -1,0 +1,11 @@
+mutation(
+    $id: ID!
+    $name: String!
+    $description: String!
+){
+    res: updatePaymentMethod(id: $id, name: $name, description: $description){
+        id
+        name
+        description
+    }
+}

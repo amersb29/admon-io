@@ -1,0 +1,7 @@
+query {
+    paymentMethods {
+        id
+        name
+        description
+    }
+}

@@ -1,0 +1,11 @@
+mutation(
+    $id: ID!
+    $name: String!
+    $code: String!
+){
+    res: updateCountry(id: $id, name: $name, code: $code){
+        id
+        name
+        code
+    }
+}

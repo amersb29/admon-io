@@ -19,24 +19,19 @@
 
 <script>
 import MembresiasTable from "./Membresias/MembresiasTable";
-import MembresiasForm from "./Membresias/MembresiasForm";
 import PaisesTable from "./Paises/PaisesTable";
-import PaisesForm from "./Paises/PaisesForm";
 import RolesTable from "./Roles/RolesTable";
-import RolesForm from "./Roles/RolesForm";
 import TiposDeProductoTable from "./Productos/TiposDeProductoTable";
-import TiposDeProductoForm from "./Productos/TiposDeProductoForm";
 import MetodosDePagoTable from "./MetodosDePago/MetodosDePagoTable";
-import MetodosDePagoForm from "./MetodosDePago/MetodosDePagoForm";
 
 export default {
     name: 'accordion-card',
     components: {
-        MembresiasTable, MembresiasForm,
-        PaisesTable, PaisesForm,
-        RolesTable, RolesForm,
-        TiposDeProductoTable, TiposDeProductoForm,
-        MetodosDePagoTable, MetodosDePagoForm
+        MembresiasTable,
+        PaisesTable,
+        RolesTable,
+        TiposDeProductoTable,
+        MetodosDePagoTable, 
     },
     props: {
         id: String,

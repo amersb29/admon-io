@@ -1,0 +1,8 @@
+mutation(
+    $description: String!
+){
+    res: createTipoProducto(description: $description){
+        id
+        description
+    }
+}

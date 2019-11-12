@@ -1,0 +1,11 @@
+mutation(
+    $id: ID!
+    $name: String!
+    $description: String!
+){
+    res: updateRole(id: $id, name: $name, description: $description){
+        id
+        name
+        description
+    }
+}

@@ -1,0 +1,10 @@
+mutation(
+    $name: String!
+    $code: String!
+){
+    res: createCountry(name: $name, code: $code){
+        id
+        name
+        code
+    }
+}

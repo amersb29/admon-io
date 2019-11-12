@@ -1,0 +1,5 @@
+mutation($id: ID!){
+    res: deletePaymentMethod(id: $id){
+        id
+    }
+}
