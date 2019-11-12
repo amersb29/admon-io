@@ -70,12 +70,6 @@
                             </b-th>
                         </b-tr>
                     </template>
-                    <template v-slot:cell(id)="data">
-                        {{ data.value }}
-                    </template>
-                    <template v-slot:cell(name)="data">
-                        {{ data.value }}
-                    </template>
                     <template v-slot:cell(price)="data">
                         {{ data.value | currency }}
                     </template>
