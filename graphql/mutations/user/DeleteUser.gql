@@ -1,10 +1,10 @@
 mutation(
     $id: ID!
-    $roles: [ID!]!
+    # $roles: [ID!]!
 ){
-    deleteUser( input: {
+    res: deleteUser( input: {
         id: $id
-        roles: { disconnect: $roles }
+        # roles: { disconnect: $roles }
     }){
         id
     }

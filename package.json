@@ -32,6 +32,7 @@
     "vue-clickaway": "^2.2.2",
     "vue-notifyjs": "^0.4.3",
     "vue-server-renderer": "^2.6.10",
+    "vue-sweetalert2": "^2.1.5",
     "vue-sweetalert2-component": "^1.0.1",
     "vue-template-compiler": "^2.6.10"
   },

@@ -1,77 +1,79 @@
 <template>
-    <div class="row">
-      <div class="col-12">
-        <ApolloQuery
-            :query="require('@/graphql/queries/users.gql')" 
-            :context="this.apolloContext">
-            <template v-slot="{ result: { loading, error, data } }">
-                <!-- Loading -->
-                <div v-if="loading" class="loading apollo">Loading...</div>
-
-                <!-- Error -->
-                <div v-else-if="error" class="error apollo">An error occurred</div>
-
-                <!-- Result -->
-                <div v-else-if="data" class="result apollo">
-                    <card :title="table1.title" 
-                          :actions="table1.actions" 
-                          @create-user-modal="showCreatedUsrModal">
-                        <div slot="raw-content" class="table-responsive">
-                            <b-table striped hover :class="tableClass" :items="data.users" :fields="fields">
-                                <template slot="name" slot-scope="data">
-                                    <i class="fa fa-circle" :class=" {'text-info': data.item.state, 
-                                                                    'text-danger': !data.item.state }"></i>
-                                    {{ data.item.first_name }} {{ data.item.last_name }}
-                                </template>
-                                <template slot="roles" slot-scope="data">
-                                    {{ data.item.roles | printRoles }}
-                                </template>
-                                <template slot="acciones" slot-scope="data">
-                                    <p-button round icon
-                                                @click="() => alert('Editar: ' + data.item.id)" 
-                                                type="primary" 
-                                                class="btn-just-icon: ti-pencil">
-                                    </p-button>
-                                    <p-button round icon 
-                                                @click="deleteUser(data.item)" 
-                                                type="danger" 
-                                                class="btn-just-icon: ti-trash">
-                                    </p-button>
-                                </template>
-                            </b-table>
-                        </div>
-                    </card>
-                </div>
-
-                <!-- No result -->
-                <div v-else class="no-result apollo">No result :(</div>
-            </template>
-        </ApolloQuery>
-      </div>
-      <b-modal id="create-user-modal" title="Registrar Usuario" hide-footer hide-header>
-        <edit-profile-form textButton="Registrar Usuario" 
-                           formTitle="Registrar Usuarios"
-                           @user-created="userCreated"
-                           @user-creation-error="userCreationError"
-                           :updateMethod="updateCache">
-        </edit-profile-form>
-      </b-modal>
-      <div ref="container"></div>
+    <div>
+      <b-row>
+        <b-col md="8">
+          <b-row >
+            <b-col>
+                <b-button v-b-toggle.usersTable variant="success" size="sm">
+                  <i :class="{'fa': true, 'fa-caret-up': usersTableBttnIcon, 'fa-caret-down': !usersTableBttnIcon}"></i> 
+                  Mostrar Usuarios 
+                </b-button>
+                <b-button v-b-toggle.createUser variant="primary" size="sm">
+                  <i :class="{'fa': true, 'fa-caret-up': createUserBttnIcon, 'fa-caret-down': !createUserBttnIcon}"></i> 
+                  Crear Usuario 
+                </b-button>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col>
+              <b-collapse id="createUser" class="mt-2">
+                <edit-profile-form ref="form-create-user" 
+                                  textButton="Registrar Usuario" 
+                                  @user-created="userCreated"
+                                  @user-creation-error="userCreationError"
+                                  :updateMethod="updateMethod">
+                </edit-profile-form>
+              </b-collapse>
+              <b-collapse id="usersTable" class="mt-2" :visible="usersTableBttnIcon">
+                <b-card>
+                  <apollo-crud ref="userTable"
+                          :catalogo="getCatalogo"
+                          :table_fields="fields"
+                          :query="query"
+                          :createMutation="createM"
+                          :updateMutation="updateM"
+                          :deleteMutation="deleteM"
+                          :showDetailsButton="true"
+                          :showFormHeader="false"
+                          :fixedTable="false"
+                          @onDetails="showDetails"
+                          @onEditOrDelete="editOrDelete"></apollo-crud>
+                </b-card>
+              </b-collapse>
+            </b-col>
+          </b-row>
+        </b-col>
+        <b-col>
+          <b-card style="height: 550px"></b-card>
+        </b-col>
+      </b-row>
     </div>
 </template>
 
 <script>
-import { setContext } from "apollo-link-context";
-import usersList from '@/graphql/queries/users.gql';
-import deleteUserMut from '@/graphql/mutations/user/DeleteUser.gql';
+import ApolloCrud from '@/components/ApolloCrud'
+import actions from '@/enums/actions'
+import catalogos from '@/enums/catalogos'
+
+import usersList from '@/graphql/queries/usuarios/users.gql';
+import createMutation from '@/graphql/queries/usuarios/users.gql';
+import updateMutation from '@/graphql/queries/usuarios/users.gql';
+import deleteMutation from '@/graphql/mutations/user/DeleteUser.gql';
 
 import EditProfileForm from './profile/UserProfile/EditProfileForm.vue'
 
 export default {
-  components: {EditProfileForm},
+  components: { ApolloCrud, EditProfileForm },
   layout: 'dashboard/DashboardLayout',
+  mounted(){
+    this.updateMethod = this.$refs.userTable.updateCache
+    this.$root.$on('bv::collapse::state', (collapseId, isJustShown) => {
+      this[`${collapseId}BttnIcon`] = isJustShown
+    })
+  },
   data() {
       return {
+        
         fields: [
           {
             key: 'id',
@@ -97,51 +99,43 @@ export default {
               label: ''
           }
         ],
-        table1: {
-            title: "Usuarios",
-            columns: ["Id", "Nombre", "Membresía", "Roles"],
-            actions: [{name: 'Create Users', icon: 'plus-square', eventName: 'create-user-modal'  }]
-        },
-        modalShowed: false,
+        query: usersList,
+        createM: createMutation,
+        updateM: updateMutation,
+        deleteM: deleteMutation,
+        updateMethod: null,
+
+        createUserBttnIcon: false,
+        usersTableBttnIcon: true,
       }
   },
   computed: {
     tableClass() {
       return `table-striped`;
     },
-    apolloContext() {
-      return setContext((request, previousContext) => ({
-                headers: {Authorization: `Bearer ${localStorage.getItem('apollo-token')}`}
-              }));
-    }
+    getCatalogo: () => catalogos.USUARIOS,
   },
   methods: {
-    showCreatedUsrModal(e){
-      this.$bvModal.show('create-user-modal')
+    editOrDelete(e){
+      if(e.action === actions.DELETE) {
+        this.deleteUser( e.item )
+      }
+    },
+    showDetails(e) {
+      console.log(e)
     },
     userCreated(e){
-      this.$bvModal.hide('create-user-modal')
+      this.$root.$emit('bv::toggle::collapse', 'createUser')
       
-      const options = {
-        icon: 'ti-user',
-        horizontal: 'center',
-        vertical: 'top',
-        message: 'El Usuario ha sido creado correctamente',
-        type: 'success'
-      }
-      this.showNotification( options )
-    },
-    updateCache(store, {data: { createUser } }){
-      const query = {query: usersList };
+      let mixin = this.$swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 4000,
+          timerProgressBar: true,
+        })
 
-      const data = store.readQuery( query )
-
-      data.users.push(createUser)
-      // Write back to the cache
-      store.writeQuery({
-        ...query,
-        data,
-      })
+        mixin.fire('El Usuario ha sido creado correctamente', '', 'success')
     },
     userCreationError(e) {
       const options = {
@@ -154,17 +148,20 @@ export default {
       this.showNotification( options )
     },
     deleteUser( user ) {
-        this.$apollo.mutate({
-        // Query
-        mutation: deleteUserMut,
-        // Parameters
-        variables: { id: user.id, roles: user.roles.map( rol => rol.id ) },
-        // update: this.updateMethod
-      }).then((data) => {
-        this.$emit('user-created');
-      }).catch((error) => {
-        this.$emit('user-creation-error');
-      })
+        this.$swal(
+          {
+            title: '<i class="fa fa-exclamation-circle" style="font-size: 7rem !important; color: #F3BB45 !important; width: 100%;"></i> ¡Cuidado!',
+            text: `¿Desea borrar al usuario ${user.first_name} ${user.last_name}?`,
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, bórralo!',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Cancelar'
+          }).then( result => {
+            if(result.value){                  
+              this.$refs.userTable.executeMutation();
+            }
+          })
     },
     showNotification( options ) {
       this.$notify({
@@ -176,20 +173,12 @@ export default {
         type: options.type
       });
     }
-  },
-  filters: {
-    printRoles: function ( roles ) {
-        return ( roles || [] )
-               .map( rol => rol.name)
-               .sort()
-               .join(', ');
-    }
-  },
+  }
 }
 </script>
 
-<style lang="scss" scoped>
-  .modal-title {
-    font-size: 2.5em;
+<style lang="scss">
+  .swal2-title {
+    flex-direction: column;
   }
 </style>

@@ -23,6 +23,7 @@ export default {
   ** Global CSS
   */
   css: [
+    '@/node_modules/sweetalert2/dist/sweetalert2.min.css'
   ],
   /*
   ** Plugins to load before mounting the App
@@ -35,6 +36,7 @@ export default {
     '~/plugins/SidebarPlugin/index',
     '~/plugins/eliminar-acentos',
     '~/plugins/accounting.js',
+    '~/plugins/printRoles.js',
   ],
   /*
   ** Nuxt.js modules
@@ -50,7 +52,10 @@ export default {
     //Apollo
     '@nuxtjs/apollo',
     //Sweet Alert 2
-    'nuxt-sweetalert2',
+    ['vue-sweetalert2/nuxt', {
+      confirmButtonColor: '#41b882',
+        cancelButtonColor: '#ff7674'
+    }],
   ],
   /*
   ** Axios module configuration

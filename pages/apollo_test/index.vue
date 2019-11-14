@@ -1,7 +1,7 @@
 <template>
     <div>
         <ApolloQuery
-            :query="require('../../graphql/queries/users.gql')"
+            :query="require('../../graphql/queries/usuarios/users.gql')"
         >
             <template v-slot="{ result: { loading, error, data } }">
                 <!-- Loading -->

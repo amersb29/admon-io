@@ -2,26 +2,34 @@
   <card class="card" :title="formTitle">
     <div>
       <form ref="createUsrForm">
-        <div class="row">
-          <div class="col-md-6">
+        <b-row>
+          <b-col md="4">
             <fg-input type="text"
                       label="Nombre"
                       placeholder="Escriba el Nombre"
                       required
                       v-model="user.firstName">
             </fg-input>
-          </div>
-          <div class="col-md-6">
+          </b-col>
+          <b-col md="4">
             <fg-input type="text"
                       label="Apellido(s)"
                       placeholder="Escriba el/los Apellido(s)"
                       required
                       v-model="user.lastName">
             </fg-input>
-          </div>
-        </div>
+          </b-col>
+          <b-col md="4">
+            <fg-input type="email"
+                      label="Correo electrónico"
+                      placeholder="Escriba el Correo electrónico"
+                      required
+                      v-model="user.email">
+            </fg-input>
+          </b-col>
+        </b-row>
 
-        <div class="row">
+        <!-- <div class="row">
           <div class="col-md-12">
             <fg-input type="email"
                       label="Correo electrónico"
@@ -30,28 +38,31 @@
                       v-model="user.email">
             </fg-input>
           </div>
-        </div>
+        </div> -->
 
-        <div class="row">
-          <div class="col-md-6">
+        <b-row>
+          <b-col md="4">
             <fg-input type="password"
                       label="Contraseña"
                       placeholder="Escriba la Contraseña"
                       required
                       v-model="user.password">
             </fg-input>
-          </div>
-          <div class="col-md-6">
+          </b-col>
+          <b-col md="4">
             <fg-input type="password"
                       label="Confirmar Contraseña"
                       placeholder="Confirmar Contraseña"
                       required>
             </fg-input>
-          </div>
-        </div>
+          </b-col>
+          <b-col md="4">
+            &nbsp;
+          </b-col>
+        </b-row>
 
-        <div class="row">
-          <div class="col-md-6">
+        <b-row>
+          <b-col md="4">
             <label for="countries">Pa&iacute;s</label>
             <apollo-select
               id="apollo_countries"
@@ -60,8 +71,8 @@
               optionText="name"
               @change="onSelectChange($event, 'country')"
             />
-          </div>
-          <div class="col-md-6">
+          </b-col>
+          <b-col md="4">
             <label for="memberships">Membres&iacute;a</label>
             <apollo-select
               id="apollo_memberships"
@@ -70,18 +81,18 @@
               initialNullText="Sin membresía"
               @change="onSelectChange($event, 'membership')"
             />            
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6">
+          </b-col>
+          <b-col md="4">
             <label for="state">Estado</label>
             <b-form-select id="state" class="custom-dropdown" v-model="user.state">
               <option value="0" selected>Inactivo</option>
               <option value="1" >Activo</option>
             </b-form-select>
-          </div>
-          <div class="col-md-6">
+          </b-col>
+        </b-row>
+
+        <b-row>
+          <b-col md="4">
             <label for="role">Perfil</label>
             <apollo-select
               id="apollo_roles"
@@ -91,11 +102,8 @@
               :arrayModel="user.roles"
               @change="onSelectChange($event, 'roles')"
             />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-12">
+          </b-col>
+          <b-col md="8">
             <div class="form-group">
               <label>Notas</label>
               <textarea rows="5" class="form-control border-input"
@@ -103,8 +111,9 @@
                         v-model="user.aboutMe">
               </textarea>
             </div>
-          </div>
-        </div>
+          </b-col>
+        </b-row>
+
         <div class="text-center">
           <p-button type="submit"
                     round

@@ -8,7 +8,7 @@ mutation(
     $state: Int!
     $roles: [ID!]
 ){
-    createUser( input: {
+    res: createUser( input: {
         first_name: $firstName
         last_name:  $lastName
         email:      $email

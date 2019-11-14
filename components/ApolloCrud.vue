@@ -1,5 +1,6 @@
 <template>
-          <ApolloQuery :query="require(`@/graphql/queries/catalogos/${catalogo.id}.gql`)"
+          <ApolloQuery :query="require(`@/graphql/queries/${catalogo.folder}/${catalogo.id}.gql`)"
+                       :context="apolloContext"
                     @result="setBusy(false)">
         <template v-slot="{ result: { loading, error, data } }">
             <!-- Loading -->
@@ -13,14 +14,13 @@
                 <b-table borderless
                             :busy="isBusy"
                             :fields="table_fields"
-                            fixed
+                            :fixed="isFixedTable"
                             hover
                             :items="getItems(data)" 
                             responsive>
-                    <template v-slot:thead-top="data">
+                    <template v-slot:thead-top="data" v-if="isFormHeaderShown">
                         <b-tr v-if="currentAction !== actions.DELETE">
-                            <b-th v-for="field of table_fields" :key="field.key"
-                            :style="{'width': field.key === 'id' ? '60px' : field.key !== 'acciones' ? '230px' : false }">
+                            <b-th v-for="field of table_fields" :key="field.key">
                                 <b-input hidden 
                                         name="id"
                                         v-if="field.key === 'id'"
@@ -50,8 +50,8 @@
                             </b-th>
                         </b-tr>
                         <b-tr v-else>
-                            <b-th style="width: 60px">&nbsp;</b-th>
-                            <b-th style="width: 450px" colspan="2">
+                            <b-th>&nbsp;</b-th>
+                            <b-th colspan="2">
                                 Está seguro que desea borrar {{ catalogo.articulo_singular.toLowerCase() }} {{catalogo.singular}} "{{ selectedItem.name || selectedItem.description }}"?
                             </b-th>
                             <b-th>
@@ -70,6 +70,14 @@
                             </b-th>
                         </b-tr>
                     </template>
+                    <template v-slot:cell(name)="data" v-if="catalogo.id === 'users'">
+                        <i class="fa fa-circle" :class=" {'text-info': data.item.state, 
+                                                            'text-danger': !data.item.state }"></i>
+                        {{ data.item.first_name }} {{ data.item.last_name }}
+                    </template>
+                    <template v-slot:cell(roles)="data">
+                        {{ data.value | printRoles }}
+                    </template>
                     <template v-slot:cell(price)="data">
                         {{ data.value | currency }}
                     </template>
@@ -84,6 +92,12 @@
                                     variant="danger"
                                     size="sm">
                                     <i class="fa fa-trash fa-lg"></i>
+                            </b-button>
+                            <b-button @click="showDetails(data.item.id)"
+                                    v-if="showDetailsButton"
+                                    variant="primary"
+                                    size="sm">
+                                    <i class="fa fa-eye fa-lg"></i>
                             </b-button>
                         </div>
                     </template>
@@ -105,6 +119,9 @@ import propiedades from '@/enums/propiedades'
 
 export default {
     name: 'apollo-crud',
+    beforeMount(){
+        this.token = localStorage.getItem('apollo-token')
+    },
     created(){
         this.resetSelectedItem()  
     },
@@ -113,6 +130,18 @@ export default {
         baseVariablesObj: {},
         catalogo: null,
         table_fields: null,
+        showDetailsButton: {
+            type: Boolean,
+            default: false
+        },
+        showFormHeader: {
+            type: Boolean,
+            default: true
+        },
+        fixedTable: {
+            type: Boolean,
+            default: true
+        },
 
         query: null,
         createMutation: null,
@@ -125,12 +154,16 @@ export default {
             actions: actions,
             currentAction: -1, 
             isBusy: true,
-            selectedItem: null
+            selectedItem: null,
+            token: null,
         }
     },
     computed: {
         actionButton() {
             return this.currentAction === actions.CREATE ? 'save' : 'pencil' 
+        },
+        apolloContext() {
+          return {headers: {'Authorization': `Bearer ${this.token}`}}        
         },
         buttonVariant(){
             return this.currentAction === actions.CREATE ? 'primary' : 'warning'
@@ -139,6 +172,12 @@ export default {
             get: function() { return this.selectedItem.price ? accounting.formatMoney(this.selectedItem.price) : '' },
             set: function(value) { this.selectedItem.price = accounting.unformat(value) }
         },
+        isFixedTable(){
+            return this.fixedTable
+        },
+        isFormHeaderShown() {
+            return this.showFormHeader
+        }
     },
     methods: {
         executeMutation() {
@@ -147,21 +186,25 @@ export default {
                 variables: this.getVariables(),
                 update: this.updateCache
             }).then((data) => {                
-                this.$notify({
-                    icon: 'ti-user',
-                    horizontal: 'center',
-                    vertical: 'top',
-                    message: this.getMessage(this.catalogo),
-                    type: 'success'
+                let mixin = this.$swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true,
                 })
+
+                mixin.fire(this.getMessage(this.catalogo), '', 'success')
+
                 this.resetSelectedItem()
             }).catch((error) => {
-                console.log("ERROR", error)
+                // console.log("ERROR", error)
             })
         },
         editOrDelete( item, action ) {
             this.currentAction = action
             this.selectedItem = {...item}
+            this.$emit('onEditOrDelete', {action: this.currentAction, item: this.selectedItem})
         },
         getItems( data ){
             return data[this.catalogo.id]
@@ -212,6 +255,13 @@ export default {
               case actions.CREATE:
                   delete baseVariablesObj.id
                   break
+              case actions.DELETE:
+                  Object.keys(baseVariablesObj).map( prop => {
+                      if(prop !== 'id') {
+                          delete baseVariablesObj[prop]
+                      }
+                  })
+                  break
           }  
 
           return baseVariablesObj
@@ -222,6 +272,9 @@ export default {
         },
         setBusy(state) {
             this.isBusy = state
+        },
+        showDetails( id ){
+            this.$emit('onDetails', {id})
         },
         updateCache(store, {data: { res } }){
             const query = {query: this.query };
@@ -251,5 +304,13 @@ export default {
 <style>
     .buttonsContainer {
         margin-left: 15px;
+    }
+
+    th:first-child {
+        width: 10%;
+    }
+
+    th, td {
+        vertical-align: middle !important;
     }
 </style>
