@@ -1,5 +1,5 @@
 query($id: ID!){
-  product(id: $id){
+  res: product(id: $id){
     id
     name
     description

@@ -1,7 +1,7 @@
 <template>
           <ApolloQuery :query="require(`@/graphql/queries/${catalogo.folder}/${catalogo.id}.gql`)"
                        :context="apolloContext"
-                    @result="setBusy(false)">
+                    @result="setBusy($event, false)">
         <template v-slot="{ result: { loading, error, data } }">
             <!-- Loading -->
             <div v-if="loading" class="loading apollo">Loading...</div>
@@ -11,13 +11,22 @@
 
             <!-- Result -->
             <div v-else-if="data" class="result apollo">
+                <b-pagination align="right"
+                            v-model="currentPage"
+                            :per-page="perPage"
+                            size="sm"
+                            :total-rows="totalRows"></b-pagination>
                 <b-table borderless
-                            :busy="isBusy"
-                            :fields="table_fields"
-                            :fixed="isFixedTable"
-                            hover
-                            :items="getItems(data)" 
-                            responsive>
+                        :busy="isBusy"
+                        :current-page="currentPage"
+                        :fields="table_fields"
+                        :filter="filter"
+                        @filtered="updateTotalRows(($event.length || 0))"
+                        :fixed="isFixedTable"
+                        hover
+                        :items="getItems(data)" 
+                        :per-page="perPage"
+                        responsive>
                     <template v-slot:thead-top="data" v-if="isFormHeaderShown">
                         <b-tr v-if="currentAction !== actions.DELETE">
                             <b-th v-for="field of table_fields" :key="field.key">
@@ -129,7 +138,11 @@ export default {
         
         baseVariablesObj: {},
         catalogo: null,
-        table_fields: null,
+        filter: null,
+        fixedTable: {
+            type: Boolean,
+            default: true
+        },
         showDetailsButton: {
             type: Boolean,
             default: false
@@ -138,15 +151,12 @@ export default {
             type: Boolean,
             default: true
         },
-        fixedTable: {
-            type: Boolean,
-            default: true
-        },
+        table_fields: null,
 
-        query: null,
         createMutation: null,
-        updateMutation: null,
         deleteMutation: null,
+        updateMutation: null,
+        query: null,
         
     },
     data() {
@@ -156,6 +166,10 @@ export default {
             isBusy: true,
             selectedItem: null,
             token: null,
+
+            currentPage: 1,
+            perPage: 15,
+            totalRows: 0,
         }
     },
     computed: {
@@ -270,8 +284,9 @@ export default {
             this.selectedItem = {...this.baseVariablesObj}
             this.currentAction = actions.CREATE
         },
-        setBusy(state) {
+        setBusy($event, state) {
             this.isBusy = state
+            this.updateTotalRows($event.data && $event.data.products ? $event.data.products.length : 0)
         },
         showDetails( id ){
             this.$emit('onDetails', {id})
@@ -296,6 +311,7 @@ export default {
                 data,
             })
         },
+        updateTotalRows(length) { this.totalRows = length },
     }
 
 }

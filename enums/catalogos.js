@@ -9,6 +9,7 @@ const catalogos = {
     TIPOS_PRODUCTO: { id: 'tiposProducto', folder: 'catalogos', articulo_singular: aS, articulo_plural: aP, singular: 'tipo de producto', plural: 'tipos de producto' },
 
     USUARIOS: {id: 'users',  folder: 'usuarios', articulo_singular: aS, articulo_plural: aP, singular: 'usuario', plural: 'usuarios' },
+    PRODUCTOS: {id: 'products',  folder: 'productos', articulo_singular: aS, articulo_plural: aP, singular: 'producto', plural: 'productos' },
 }
 
 export default Object.freeze(catalogos);
