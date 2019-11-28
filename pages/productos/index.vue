@@ -32,13 +32,8 @@
                 </b-card>
               </b-collapse>
               <b-collapse id="createProduct" class="mt-2">
-                  Product Form
-                <!-- <edit-profile-form ref="form-create-user" 
-                                  textButton="Registrar Usuario" 
-                                  @user-created="userCreated"
-                                  @user-creation-error="userCreationError"
-                                  :updateMethod="updateMethod">
-                </edit-profile-form> -->
+                <edit-products-form :productId="selectedId"
+                                    :action="formAction"></edit-products-form>
               </b-collapse>
               <b-collapse id="productsTable" class="mt-2" :visible="productsTableBttnIcon">
                 <b-card>
@@ -46,14 +41,11 @@
                           :catalogo="getCatalogo"
                           :filter="filter"
                           :fixedTable="false"
-                          @onDetails="showDetails"
                           @onEditOrDelete="editOrDelete"
                           :showDetailsButton="false"
                           :showFormHeader="false"
                           :table_fields="fields"
-                          :createMutation="createM"
                           :deleteMutation="deleteM"
-                          :updateMutation="updateM"
                           :query="query"></apollo-crud>
                 </b-card>
               </b-collapse>
@@ -67,16 +59,16 @@
 <script>
 import ApolloCrud from '@/components/ApolloCrud'
 import ApolloSelect from '@/components/ApolloSelect'
+import EditProductsForm from './EditProductsForm'
+
 import actions from '@/enums/actions'
 import catalogos from '@/enums/catalogos'
 
 import productsList from '@/graphql/queries/productos/products.gql'
-import createMutation from '@/graphql/queries/productos/edit_productos.gql'
-import updateMutation from '@/graphql/queries/productos/edit_productos.gql'
 import deleteMutation from '@/graphql/mutations/user/DeleteUser.gql'
 
 export default {
-  components: { ApolloCrud, ApolloSelect },
+  components: { ApolloCrud, ApolloSelect, EditProductsForm },
   layout: 'dashboard/DashboardLayout',
   mounted(){
     this.updateMethod = this.$refs.productsTable.updateCache
@@ -107,9 +99,9 @@ export default {
             }
         ],
         filter: null,
+        formAction: 0,
+        selectedId: -1,
         query: productsList,
-        createM: createMutation,
-        updateM: updateMutation,
         deleteM: deleteMutation,
         updateMethod: null,
 
@@ -126,14 +118,16 @@ export default {
   },
   methods: {
     editOrDelete(e){
-      if(e.action === actions.DELETE) {
-        this.deleteUser( e.item )
+      switch (e.action) {
+        case actions.DELETE:
+          this.deleteProduct( e.item )
+          break;
+        case actions.UPDATE:
+          this.selectedId = Math.trunc(e.item.id)
+          break;
       }
     },
     onSelectChange(e) { this.filter = e && e.target ? e.target.value : e; console.log(this.filter);
-    },
-    showDetails(e) {
-      console.log(e)
     },
     userCreated(e){
       this.$root.$emit('bv::toggle::collapse', 'createUser')
@@ -158,11 +152,11 @@ export default {
       }
       this.showNotification( options )
     },
-    deleteUser( user ) {
+    deleteProduct( product ) {
         this.$swal(
           {
             title: '<i class="fa fa-exclamation-circle" style="font-size: 7rem !important; color: #F3BB45 !important; width: 100%;"></i> ¡Cuidado!',
-            text: `¿Desea borrar al usuario ${user.first_name} ${user.last_name}?`,
+            text: `¿Desea borrar el producto ${product.name}?`,
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'Sí, bórralo!',

@@ -1,5 +1,5 @@
 query($id: ID!){
-  res: product(id: $id){
+  product(id: $id){
     id
     name
     description
@@ -7,6 +7,7 @@ query($id: ID!){
       id
     }
     videos {
+      id
       is_preview
       vimeo_id
     }

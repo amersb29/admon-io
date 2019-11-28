@@ -28,18 +28,6 @@
             </fg-input>
           </b-col>
         </b-row>
-
-        <!-- <div class="row">
-          <div class="col-md-12">
-            <fg-input type="email"
-                      label="Correo electrónico"
-                      placeholder="Escriba el Correo electrónico"
-                      required
-                      v-model="user.email">
-            </fg-input>
-          </div>
-        </div> -->
-
         <b-row>
           <b-col md="4">
             <fg-input type="password"

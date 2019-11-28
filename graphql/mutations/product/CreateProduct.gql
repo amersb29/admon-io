@@ -1,0 +1,26 @@
+mutation(
+    $name: String!
+    $description: String!
+    $tipo_producto_id: Int!
+    $url_img: String!
+    $videos: [VideoInput!]
+){
+    res: createProduct( input: {
+        name: $name
+        description: $description
+        tipo_producto_id: $tipo_producto_id
+        url_img: $url_img
+        videos: { create: $videos }
+    }){
+        id
+        name
+        description
+        tipoProducto {
+          id
+        }
+        videos {
+          is_preview
+          vimeo_id
+        }
+    }
+}
