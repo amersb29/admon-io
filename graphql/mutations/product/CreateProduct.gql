@@ -4,6 +4,7 @@ mutation(
     $tipo_producto_id: Int!
     $url_img: String!
     $videos: [VideoInput!]
+    $files: [Upload!]
 ){
     res: createProduct( input: {
         name: $name
@@ -15,6 +16,7 @@ mutation(
         id
         name
         description
+        url_img
         tipoProducto {
           id
         }
@@ -23,4 +25,7 @@ mutation(
           vimeo_id
         }
     }
+    upload(
+      files: $files
+    )
 }

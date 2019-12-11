@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-form>
+        <b-form ref="productsForm">
             <b-row>
                 <b-col md="6">
                     <b-card class="formCard">
@@ -31,8 +31,8 @@
                             accept=".jpg, .png, .gif"
                             id="img_producto"
                             placeholder="Seleccione la imagen del producto..."
-                            required
                             drop-placeholder="Drop file here..."
+                            v-model="product.image"
                             ></b-form-file>
                     </b-form-group>
                     </b-card>
@@ -44,39 +44,39 @@
                             accept=".doc, .pdf, .txt"
                             id="notebook_producto"
                             placeholder="Seleccione el cuaderno de trabajo..."
-                            required
                             drop-placeholder="Drop file here..."
+                            v-model="product.notebook"
                             ></b-form-file>
                     </b-form-group>
                     <b-form-group label="Preview" label-for="preview">
                         <b-input id="preview" 
-                                 required 
-                                 v-model="product.videos.preview"
-                                 placeholder="Escriba el ID de Vimeo"></b-input>
+                                 required
+                                 placeholder="Escriba el ID de Vimeo"
+                                 v-model="product.videos[0].vimeo_id"></b-input>
                     </b-form-group>
                     <b-form-group label="Video 1" label-for="video1">
-                        <b-input id="video1" 
-                                 v-model="product.videos.video1"
-                                 placeholder="Escriba el ID de Vimeo"></b-input>
+                        <b-input id="video1"
+                                 placeholder="Escriba el ID de Vimeo"
+                                 v-model="product.videos[1].vimeo_id"></b-input>
                     </b-form-group>
                     <b-form-group label="Video 2" label-for="video2">
-                        <b-input id="video2" 
-                                 v-model="product.videos.video2"
-                                 placeholder="Escriba el ID de Vimeo"></b-input>
+                        <b-input id="video2"
+                                 placeholder="Escriba el ID de Vimeo"
+                                 v-model="product.videos[2].vimeo_id"></b-input>
                     </b-form-group>
                     <b-form-group label="Video 3" label-for="video3">
                         <b-input id="video3" 
-                                 v-model="product.videos.video3"
-                                 placeholder="Escriba el ID de Vimeo"></b-input>
+                                 placeholder="Escriba el ID de Vimeo"
+                                 v-model="product.videos[3].vimeo_id"></b-input>
                     </b-form-group>
                     <b-form-group label="Video 4" label-for="video4">
-                        <b-input id="video4" 
-                                 v-model="product.videos.video4"
-                                 placeholder="Escriba el ID de Vimeo"></b-input>
+                        <b-input id="video4"
+                                 placeholder="Escriba el ID de Vimeo"
+                                 v-model="product.videos[4].vimeo_id"></b-input>
                     </b-form-group>
                     <div class="formButtonsSection">
                         <b-button-group>
-                            <b-button variant="primary" class="formButtons">
+                            <b-button variant="primary" class="formButtons" @click="createProduct()">
                                 <i class="fa fa-save fa-lg"></i>
                                 Salvar
                             </b-button>
@@ -94,9 +94,9 @@
 </template>
 
 <script>
-import ApolloSelect from '../../components/ApolloSelect.vue';
+import ApolloSelect from '../../components/ApolloSelect.vue'
 import product from '@/graphql/queries/productos/product.gql'
-import createProductsMut from '@/graphql/mutations/product/CreateProduct.gql';
+import createProducts from '@/graphql/mutations/product/CreateProduct.gql'
 
 import actions from '@/enums/actions'
 
@@ -104,57 +104,52 @@ export default {
     name: 'edit-products-form',
     components: {ApolloSelect},
     created(){
+        this.createProductsMut = createProducts;
         this.resetForm();
     },
     props: {
         productId: { type: Number },
-        action: { type: Number, default: 0 }
+        action: { type: Number, default: 0 },
+        updateMethod: Function
     },
     data() {
         return {
+            createProductsMut: null,
             emptyProduct: {
-                tpProducto: 0,
-                name: '',
                 description: '',
-                image: '',
-                videos: {
-                    preview: '',
-                    video1: '',
-                    video2: '',
-                    video3: '',
-                    video4: '',
-                }
+                id: '',
+                name: '',
+                tipoProducto: { id: -1 },
+                image: null,
+                notebook: null,
+                videos: []
+            },
+            emptyVideoObj: {
+                id: -1,
+                is_preview: 0,
+                vimeo_id: null
             },
             product: null,
             selValue: "1",
         }
     },
     methods: {
-        createUser(){
-            const form = this.$refs.productsForm;
+        createProduct(){
+            const form = this.$refs.productsForm
 
             if (form.checkValidity() === false) {
-                event.stopPropagation();
+                event.stopPropagation()
             }else {
                 this.$apollo.mutate({
-                    // Query
-                    mutation: getMutation(),
-                    // Parameters
-                    variables: {
-                    firstName: this.user.firstName,
-                    lastName:  this.user.lastName,
-                    email:     this.user.email,
-                    password:  this.user.password,
-                    mem_id:    this.user.membership,
-                    country_id: this.user.country,
-                    state: this.user.state,
-                    roles: this.user.roles,
-                    },
+                    mutation: this.getMutation(this.action),
+                    variables: this.getVariables(this.product),
                     update: this.updateMethod
                 }).then((data) => {
-                    this.$emit('user-created');
+                    this.resetForm();
+                    this.$emit('product-created')
                 }).catch((error) => {
-                    this.$emit('user-creation-error');
+                    console.log(error)
+                    this.$emit('product-creation-error')
                 })
             }
 
@@ -162,7 +157,7 @@ export default {
         },
         async fillProductForm(idx) {
             if (idx !== -1) {
-                this.resetForm();
+                this.resetForm()
     
                 const res = await this.$apollo.query({
                     query: product,
@@ -170,19 +165,13 @@ export default {
                         id: idx
                     }
                 })
-    
-                let { tipoProducto, name, description, videos } = res.data.product
-    
-                this.$refs.tpProducto.optSelected = tipoProducto.id
-    
-                this.product.name = name
-                this.product.tpProducto = tipoProducto.id
-                this.product.description = description
-    
-                videos.forEach( (video, index) => {
-                    let name = video.is_preview ? 'preview' : `video${index}` 
-                    this.product.videos[ name ] = video ? video.vimeo_id : null 
-                });
+
+                this.product = Object.assign( {}, res.data.product )
+                this.$refs.tpProducto.optSelected = this.product.tipoProducto.id
+
+                for (let index = 0; index <= (4 - res.data.product.videos.length) ; index++) {
+                    this.product.videos.push( Object.assign({},this.emptyVideoObj) )
+                }
             }
         },
         getMutation( action ) { 
@@ -190,16 +179,48 @@ export default {
                 case actions.CREATE:
                     return this.createProductsMut
                     break;
-                
             }
             
         },
-        onTpProducto(e) { this.product.tpProducto = e },
+        getVariables( {id, name, description, tipoProducto: {id: tipo_producto_id} , image, notebook, videos} ){
+            videos = videos.filter( video => video.vimeo_id !== null)
+                    .map( (video, index) => {
+                        if( this.action === actions.CREATE )
+                            delete video.id
+
+                        video.name = name
+
+                        if(index === 0){
+                            video.is_preview = 1
+                            video.name += ' - Preview'
+                        } else {
+                            video.name += ` - video ${index}`
+                        }
+
+                        return video
+                        
+                    })
+
+            if(tipo_producto_id === -1)
+                tipo_producto_id = this.$refs.tpProducto.optSelected
+
+            let variables = Object.assign({}, {id, name, description, tipo_producto_id, videos, url_img: image.name, files: [image, notebook]});
+
+            if( this.action === actions.CREATE )
+                delete variables.id
+
+            return variables
+        },
+        onTpProducto(e) { this.product.tipoProducto.id = e },
         resetForm(){ 
             this.product = Object.assign({}, this.emptyProduct) 
-            this.product.videos = Object.assign({}, this.emptyProduct.videos) 
+            
             if(this.$refs.tpProducto) 
                 this.$refs.tpProducto.optSelected = 1
+
+            for (let index = 0; index <= 4; index++) {
+                this.product.videos.push( Object.assign({},this.emptyVideoObj) )   
+            }
         },
     },
     watch: {

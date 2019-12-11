@@ -33,20 +33,23 @@
               </b-collapse>
               <b-collapse id="createProduct" class="mt-2">
                 <edit-products-form :productId="selectedId"
-                                    :action="formAction"></edit-products-form>
+                                    :action="formAction"
+                                    :updateMethod="updateMethod"
+                                    @product-created="productCreated"
+                                    @product-creation-error="productCreationError"></edit-products-form>
               </b-collapse>
               <b-collapse id="productsTable" class="mt-2" :visible="productsTableBttnIcon">
                 <b-card>
                   <apollo-crud ref="productsTable"
                           :catalogo="getCatalogo"
+                          :deleteMutation="deleteM"
                           :filter="filter"
                           :fixedTable="false"
                           @onEditOrDelete="editOrDelete"
+                          :query="query"
                           :showDetailsButton="false"
                           :showFormHeader="false"
-                          :table_fields="fields"
-                          :deleteMutation="deleteM"
-                          :query="query"></apollo-crud>
+                          :table_fields="fields"></apollo-crud>
                 </b-card>
               </b-collapse>
             </b-col>
@@ -65,7 +68,7 @@ import actions from '@/enums/actions'
 import catalogos from '@/enums/catalogos'
 
 import productsList from '@/graphql/queries/productos/products.gql'
-import deleteMutation from '@/graphql/mutations/user/DeleteUser.gql'
+import deleteMutation from '@/graphql/mutations/product/DeleteProduct.gql'
 
 export default {
   components: { ApolloCrud, ApolloSelect, EditProductsForm },
@@ -129,8 +132,9 @@ export default {
     },
     onSelectChange(e) { this.filter = e && e.target ? e.target.value : e; console.log(this.filter);
     },
-    userCreated(e){
-      this.$root.$emit('bv::toggle::collapse', 'createUser')
+    productCreated(e){
+      // this.$root.$emit('bv::toggle::collapse', 'createProduct')
+      // this.scrollToTop()
       
       let mixin = this.$swal.mixin({
           toast: true,
@@ -140,9 +144,9 @@ export default {
           timerProgressBar: true,
         })
 
-        mixin.fire('El Usuario ha sido creado correctamente', '', 'success')
+        mixin.fire('El Producto ha sido creado correctamente', '', 'success')
     },
-    userCreationError(e) {
+    productCreationError(e) {
       const options = {
         icon: 'ti-user',
         horizontal: 'center',
@@ -177,7 +181,7 @@ export default {
         verticalAlign: options.vertical,
         type: options.type
       });
-    }
+    },
   }
 }
 </script>
