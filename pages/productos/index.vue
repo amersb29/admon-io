@@ -31,11 +31,8 @@
                     optionText="description"/>
                 </b-card>
               </b-collapse>
-              <b-collapse id="createProduct" class="mt-2">
-                <edit-products-form :productId="selectedId"
-                                    :action="formAction"
-                                    :updateMethod="updateMethod"
-                                    @product-created="productCreated"
+              <b-collapse id="createProduct" ref="createProduct" class="mt-2">
+                <edit-products-form @product-created="productCreated"
                                     @product-creation-error="productCreationError"></edit-products-form>
               </b-collapse>
               <b-collapse id="productsTable" class="mt-2" :visible="productsTableBttnIcon">
@@ -74,10 +71,14 @@ export default {
   components: { ApolloCrud, ApolloSelect, EditProductsForm },
   layout: 'dashboard/DashboardLayout',
   mounted(){
-    this.updateMethod = this.$refs.productsTable.updateCache
+    // this.updateMethod = this.$refs.productsTable.updateCache
+
     this.$root.$on('bv::collapse::state', (collapseId, isJustShown) => {
       this[`${collapseId}BttnIcon`] = isJustShown
     })
+
+    this.$store.commit('changeQuery', productsList);
+    this.$store.commit('changeCatalog', catalogos.PRODUCTOS);
   },
   data() {
       return {        
@@ -102,11 +103,8 @@ export default {
             }
         ],
         filter: null,
-        formAction: 0,
-        selectedId: -1,
         query: productsList,
         deleteM: deleteMutation,
-        updateMethod: null,
 
         createProductBttnIcon: false,
         filterProductBttnIcon: false,
@@ -121,30 +119,31 @@ export default {
   },
   methods: {
     editOrDelete(e){
-      switch (e.action) {
+      switch (this.$store.state.action) {
         case actions.DELETE:
-          this.deleteProduct( e.item )
+          this.deleteProduct( this.$store.state.selectedItem )
           break;
         case actions.UPDATE:
-          this.selectedId = Math.trunc(e.item.id)
+          if( !this.$refs.createProduct.show ) {
+            this.$refs.createProduct.show = true;
+          }
           break;
       }
     },
     onSelectChange(e) { this.filter = e && e.target ? e.target.value : e; console.log(this.filter);
     },
     productCreated(e){
-      // this.$root.$emit('bv::toggle::collapse', 'createProduct')
-      // this.scrollToTop()
-      
-      let mixin = this.$swal.mixin({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 4000,
-          timerProgressBar: true,
-        })
+      // let mixin = this.$swal.mixin({
+      //     toast: true,
+      //     position: 'top-end',
+      //     showConfirmButton: false,
+      //     timer: 4000,
+      //     timerProgressBar: true,
+      //   })
 
-        mixin.fire('El Producto ha sido creado correctamente', '', 'success')
+      //   mixin.fire('El Producto ha sido creado correctamente', '', 'success')
+      console.log("Exito");
+      
     },
     productCreationError(e) {
       const options = {

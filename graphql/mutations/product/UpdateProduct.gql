@@ -1,0 +1,41 @@
+mutation(
+    $id: ID!
+    $name: String
+    $description: String
+    $tipo_producto_id: Int
+    $image: String
+    $document: String
+    $new_videos: [CreateVideoInput!]
+    $old_videos: [UpdateVideoInput!]
+    $files: [Upload]
+){
+    res: updateProduct( input: {
+        id: $id
+        name: $name
+        description: $description
+        tipo_producto_id: $tipo_producto_id
+        image: $image
+        document: $document
+        videos: { 
+                    create: $new_videos
+                    update: $old_videos
+                }
+    }){
+        id
+        name
+        description
+        image
+        document
+        tipoProducto {
+          id
+        }
+        videos {
+          is_preview
+          name
+          vimeo_id
+        }
+    }
+    upload(
+      files: $files
+    )
+}

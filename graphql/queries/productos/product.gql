@@ -6,6 +6,8 @@ query($id: ID!){
     tipoProducto {
       id
     }
+    image
+    document
     videos {
       id
       is_preview

@@ -216,7 +216,10 @@ export default {
             })
         },
         editOrDelete( item, action ) {
-            this.currentAction = action
+            this.$store.commit('changeAction', action);
+            this.$store.commit('changeSelectedItem', item);
+
+            this.currentAction = action // Se borrará en el futuro no muy lejano
             this.selectedItem = {...item}
             this.$emit('onEditOrDelete', {action: this.currentAction, item: this.selectedItem})
         },
@@ -292,24 +295,7 @@ export default {
             this.$emit('onDetails', {id})
         },
         updateCache(store, {data: { res } }){
-            const query = {query: this.query };
-
-            const data = store.readQuery( query )
-
-            if(this.currentAction === actions.CREATE){
-                data[this.catalogo.id].push(res)
-            }
-
-            if(this.currentAction === actions.DELETE){
-                let index = data[this.catalogo.id].findIndex( obj => obj.id === res.id )
-                data[this.catalogo.id].splice(index, 1)
-            }
-
-            // Write back to the cache
-            store.writeQuery({
-                ...query,
-                data,
-            })
+            this.$store.dispatch('updateCache', {store, res}) 
         },
         updateTotalRows(length) { this.totalRows = length },
     }

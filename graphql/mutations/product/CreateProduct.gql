@@ -2,21 +2,23 @@ mutation(
     $name: String!
     $description: String!
     $tipo_producto_id: Int!
-    $url_img: String!
-    $videos: [VideoInput!]
+    $image: String!
+    $document: String!
+    $new_videos: [CreateVideoInput!]
     $files: [Upload!]
 ){
     res: createProduct( input: {
         name: $name
         description: $description
         tipo_producto_id: $tipo_producto_id
-        url_img: $url_img
-        videos: { create: $videos }
+        image: $image
+        document: $document
+        videos: { create: $new_videos }
     }){
         id
         name
         description
-        url_img
+        image
         tipoProducto {
           id
         }
