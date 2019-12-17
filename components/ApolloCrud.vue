@@ -196,7 +196,7 @@ export default {
     methods: {
         executeMutation() {
             this.$apollo.mutate({
-                mutation: this.getMutation(),
+                mutation: this.$store.getters.mutation,
                 variables: this.getVariables(),
                 update: this.updateCache
             }).then((data) => {                
@@ -216,18 +216,25 @@ export default {
             })
         },
         editOrDelete( item, action ) {
+            this.$store.dispatch('manageAction', 
+                                 {
+                                    action, 
+                                    mutation: this.getMutation(action),
+                                    selectedItem: item
+                                 })
             this.$store.commit('changeAction', action);
             this.$store.commit('changeSelectedItem', item);
 
-            this.currentAction = action // Se borrará en el futuro no muy lejano
+            // TODO - Se borrará en el futuro no muy lejano
+            this.currentAction = action 
             this.selectedItem = {...item}
             this.$emit('onEditOrDelete', {action: this.currentAction, item: this.selectedItem})
         },
         getItems( data ){
             return data[this.catalogo.id]
         },
-        getMutation(){
-          switch (this.currentAction) {
+        getMutation(action){
+          switch (action) {
               case actions.CREATE: 
                   return this.createMutation
                   break

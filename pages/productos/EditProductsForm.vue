@@ -26,7 +26,7 @@
                     </b-form-textarea>
                 </b-form-group>
                 <b-form-group label="Imagen del producto" label-for="img_producto">
-                    <div v-if="!toggleImg" class="imageFileSelect">
+                    <div v-if="!product.image || toggleImg" class="imageFileSelect">
                         <b-form-file
                             accept=".jpg, .png, .gif"
                             @change="updateFileList($event)"
@@ -99,6 +99,7 @@
 import ApolloSelect from '../../components/ApolloSelect.vue'
 import product from '@/graphql/queries/productos/product.gql'
 import createProducts from '@/graphql/mutations/product/CreateProduct.gql'
+import updateProducts from '@/graphql/mutations/product/UpdateProduct.gql'
 
 import actions from '@/enums/actions'
 
@@ -165,7 +166,7 @@ export default {
                 event.stopPropagation()
             }else {
                 this.$apollo.mutate({
-                    mutation: this.getMutation(this.action),
+                    mutation: this.$store.getters.mutation, //this.getMutation(this.action),
                     variables: this.getVariables(this.$store.state.selectedItem),
                     update: this.updateMethod
                 }).then((data) => {
@@ -205,27 +206,26 @@ export default {
                 case actions.CREATE:
                     return this.createProductsMut
                     break;
+                case actions.UPDATE:
+                    return updateProducts
+                    break;
             }
             
         },
         getVariables( {id, name, description, tipoProducto: {id: tipo_producto_id} } ){ //TODO
-            let videos = this.$store.getters.videos.map( (video, index) => {                 
-                            video.name = name
-                            if(index === 0){
-                                video.is_preview = 1
-                                video.name += ' - Preview'
-                            } else {
-                                video.name += ` - Video ${index}`
-                            }
-                            return video
-                        })
+            
+            let videos = this.$store.getters.videos
+            videos.forEach( 
+                (v,idx) => {
+                    this.$store.dispatch('updateVideoProps', {idx, name})
+                })
 
-            let new_videos = videos.filter(video => { 
-                if(video.id === -1){
-                    delete video.id
-                }
-            });
-            let old_videos = videos.filter(video => video.id !== -1);
+            let old_videos = videos.filter(video => video.id && video.id !== -1);
+            let new_videos = videos.filter(video => video.id === undefined || video.id === -1)
+                                    .map( video => { 
+                                        delete video.id
+                                        return video
+        }                            );
 
             if(tipo_producto_id === -1)
                 tipo_producto_id = this.$refs.tpProducto.optSelected
@@ -244,7 +244,12 @@ export default {
         onTpProducto(e) { this.$store.commit('updateTipoProducto', e) },
         resetForm(){
             this.toggleImg = false
-            this.$store.commit('changeSelectedItem', Object.assign({}, this.emptyProduct));
+            this.$store.dispatch('manageAction', 
+                                 {
+                                    action: actions.CREATE, 
+                                    mutation: createProducts,
+                                    selectedItem: Object.assign({}, this.emptyProduct)
+                                 })
             
             if(this.$refs.tpProducto) 
                 this.$refs.tpProducto.optSelected = 1

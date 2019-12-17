@@ -6,6 +6,7 @@ export const state = () => ({
     document: undefined,
     fileList: [],
     image: undefined,
+    mutation: undefined,
     query: undefined,
     selectedItem: {},
 })
@@ -22,6 +23,9 @@ export const mutations = {
     },
     changeQuery(state, query){
         state.query = query
+    },
+    changeMutation(state, mutation){
+        state.mutation = mutation
     },
     updateName(state, value){
         state.selectedItem.name = value
@@ -40,6 +44,12 @@ export const mutations = {
     },
     updateVideo(state, {index, value}) {
         state.selectedItem.videos[index].vimeo_id = value
+    },
+    setVideoAsPreview(state, idx) {
+        state.selectedItem.videos[idx].is_preview = 1
+    },
+    setVideoName(state, {idx, newName}){
+        state.selectedItem.videos[idx].name = newName
     },
     updateVideoList(state, videoList) {
         state.selectedItem.videos = videoList
@@ -62,12 +72,27 @@ export const getters = {
     fileList: state => state.fileList ? state.fileList : [],
     docName: state => state.document ? state.document.name : undefined,
     imageName: state => state.image ? state.image.name : undefined,
+    mutation: state => state.mutation ? state.mutation : undefined,
 }
 
 export const actions = {
+    manageAction({state, commit}, {action, mutation, selectedItem}){
+        commit('changeAction', action)
+        commit('changeMutation', mutation)
+        commit('changeSelectedItem', selectedItem)
+    },
     manageFile({state, commit}, file){
         let idx = (/\.(gif|jpg|jpeg|tiff|png)$/i).test(file.name) ? 0 : 1
         commit('addFile', {idx, file})
+    },
+    updateVideoProps({commit}, {idx, name}){
+        let suffix = idx === 0 ? ' - Preview' : ` - Video ${idx}` 
+        let newName = `${name} ${suffix}` 
+        
+        if( idx === 0 ) {
+            commit('setVideoAsPreview', idx)
+        }
+        commit('setVideoName', {idx, newName})
     },
     updateCache( { state, getters } , { store, res } ){
         const query = {query: state.query };
