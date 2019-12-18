@@ -132,7 +132,6 @@ export default {
           position: 'top-end',
           showConfirmButton: false,
           timer: 4000,
-          timerProgressBar: true,
         })
 
         mixin.fire('El Usuario ha sido creado correctamente', '', 'success')

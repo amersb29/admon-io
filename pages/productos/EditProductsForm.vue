@@ -196,7 +196,7 @@ export default {
                 this.scrollToTop()
             }
         },
-        getVariables( {id, name, description, tipoProducto: {id: tipo_producto_id} } ){ //TODO
+        getVariables( {id, name, description, tipoProducto: {id: tipo_producto_id} } ){
             
             let videos = this.$store.getters.videos
             videos.forEach( 
@@ -209,7 +209,7 @@ export default {
                                     .map( video => { 
                                         delete video.id
                                         return video
-        }                            );
+                                    });
 
             if(tipo_producto_id === -1)
                 tipo_producto_id = this.$refs.tpProducto.optSelected
@@ -237,7 +237,7 @@ export default {
                                  {
                                     action: actions.CREATE, 
                                     mutation: createProducts,
-                                    selectedItem: Object.assign({}, this.emptyProduct)
+                                    item: Object.assign({}, this.emptyProduct)
                                  })
             
             if(this.$refs.tpProducto) 
@@ -274,7 +274,7 @@ export default {
         },
         name: {
             get () {
-                return this.$store.state.selectedItem.name
+                return this.$store.getters.name
             },
             set (value) {
                 this.$store.commit('updateName', value)
@@ -282,7 +282,7 @@ export default {
         },
         description: {
             get () {
-                return this.$store.state.selectedItem.description
+                return this.$store.getters.description
             },
             set (value) {
                 this.$store.commit('updateDescription', value)
@@ -290,7 +290,7 @@ export default {
         },
         image: {
             get () {
-                return this.$store.state.image
+                return this.$store.getters.image
             },
             set (file) {
                 this.$store.commit('updateImage', file)
@@ -298,7 +298,7 @@ export default {
         },
         notebook: {
             get () {
-                return this.$store.state.document
+                return this.$store.getters.document
             },
             set (file) {
                 this.$store.commit('updateDocument', file)

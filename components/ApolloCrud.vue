@@ -218,6 +218,7 @@ export default {
                 mixin.fire(this.getMessage(this.catalogo), '', 'success')
 
                 this.resetSelectedItem()
+                this.$store.commit('changeSelectedItem', Object.assign({}, this.baseVariablesObj ) )
             }).catch((error) => {
                 // console.log("ERROR", error)
             })
@@ -276,7 +277,6 @@ export default {
         },
         resetSelectedItem() {
             this.formItem = Object.assign({}, this.baseVariablesObj )
-            this.$store.commit('changeSelectedItem', Object.assign({}, this.baseVariablesObj ) )
             this.$store.commit('changeAction', actions.CREATE)
             this.$emit('onResetForm', {action: actions.CREATE})
         },

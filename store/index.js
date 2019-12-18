@@ -68,19 +68,22 @@ export const mutations = {
 }
 
 export const getters = {
+    catalog: state => state.catalog ? state.catalog : cat.MEMBRESIAS ,
+    catalogId: state => state.catalog ? state.catalog.id : undefined ,
+    description: state => state.selectedItem ? state.selectedItem.description : undefined,
+    document: state => state.document ? state.document : undefined,
+    docName: state => state.document ? state.document.name : undefined,
+    fileList: state => state.fileList ? state.fileList : [],
+    image: state => state.image ? state.image : undefined,
+    imageName: state => state.image ? state.image.name : undefined,
+    mutation: state => state.mutation ? state.mutation : undefined,
+    name: state => state.selectedItem ? state.selectedItem.name : undefined,
+    query: state => state.query ? state.query : undefined,
     selectedItemId: state => state.selectedItem ? state.selectedItem.id : -1,
     tipoProductoId: state => state.selectedItem ? state.selectedItem.tipoProducto.id : 1,
     videos: state => state.selectedItem.videos ? state.selectedItem.videos.filter( video => video.vimeo_id !== null) : [],
     videosLength: state => state.selectedItem ? state.selectedItem.videos.length : 0,
-    catalog: state => state.catalog ? state.catalog : cat.MEMBRESIAS ,
-    catalogId: state => state.catalog ? state.catalog.id : undefined ,
     vimeoId: state => idx => state.selectedItem.videos[idx].vimeo_id,
-    fileList: state => state.fileList ? state.fileList : [],
-    docName: state => state.document ? state.document.name : undefined,
-    imageName: state => state.image ? state.image.name : undefined,
-    mutation: state => state.mutation ? state.mutation : undefined,
-
-    query: state => state.query ? state.query : undefined,
 }
 
 export const actions = {

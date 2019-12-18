@@ -38,11 +38,9 @@
               <b-collapse id="productsTable" class="mt-2" :visible="productsTableBttnIcon">
                 <b-card>
                   <apollo-crud ref="productsTable"
-                          :catalogo="getCatalogo"
                           :filter="filter"
                           :fixedTable="false"
                           @onEditOrDelete="editOrDelete"
-                          :query="query"
                           :showDetailsButton="false"
                           :showFormHeader="false"
                           :table_fields="fields"></apollo-crud>
@@ -66,10 +64,13 @@ import catalogos from '@/enums/catalogos'
 import productsList from '@/graphql/queries/productos/products.gql'
 import deleteMutation from '@/graphql/mutations/product/DeleteProduct.gql'
 import updateMutation from '@/graphql/mutations/product/UpdateProduct.gql'
+import Crud from '../../components/Crud.vue'
+import { debuglog } from 'util'
 
 export default {
   components: { ApolloCrud, ApolloSelect, EditProductsForm },
   layout: 'dashboard/DashboardLayout',
+  mixins: [Crud],
   mounted(){
     this.$root.$on('bv::collapse::state', (collapseId, isJustShown) => {
       this[`${collapseId}BttnIcon`] = isJustShown
@@ -81,29 +82,12 @@ export default {
   data() {
       return {        
         fields: [
-            {
-                key: 'id',
-                sortable: true
-            },
-            {
-                key: 'name',
-                label: 'Nombre',
-                sortable: true
-            },
-            {
-                key: 'tipoProducto.description',
-                label: 'Categoría',
-                sortable: true
-            },
-            {
-                key: 'acciones',
-                label: ''
-            }
+            { key: 'id', sortable: true },
+            { key: 'name', label: 'Nombre', sortable: true },
+            { key: 'tipoProducto.description', label: 'Categoría', sortable: true },
+            { key: 'acciones', label: '' }
         ],
         filter: null,
-        query: productsList,
-        // deleteM: deleteMutation,
-
         createProductBttnIcon: false,
         filterProductBttnIcon: false,
         productsTableBttnIcon: true,
@@ -113,18 +97,10 @@ export default {
     tableClass() {
       return `table-striped`;
     },
-    getCatalogo: () => catalogos.PRODUCTOS,
   },
   methods: {
-    editOrDelete(e){
-      // this.$store.dispatch('manageAction', 
-      //                       {
-      //                         action: e.action, 
-      //                         mutation: this.getMutation(e.action),
-      //                         selectedItem: e.item
-      //                       }
-      //                     )
-
+    editOrDelete(e){debugger
+      this.changeMutation(e)
       switch (e.action) {
         case actions.DELETE:
           this.showDeleteProductAlert()
@@ -136,19 +112,6 @@ export default {
           break;
       }
     },
-    getMutation(action){
-      switch (action) {
-          case actions.CREATE: 
-              return createMutation
-              break
-          case actions.UPDATE:
-              return updateMutation
-              break;
-          case actions.DELETE:
-              return deleteMutation 
-              break
-      }
-    },
     onSelectChange(e) { this.filter = e && e.target ? e.target.value : e; console.log(this.filter);
     },
     productCreated(e){
@@ -157,7 +120,6 @@ export default {
         position: 'top-end',
         showConfirmButton: false,
         timer: 4000,  
-        timerProgressBar: true,
       })
 
       const op = e.action === actions.CREATE ? 'creado' : 'actualizado' ;
