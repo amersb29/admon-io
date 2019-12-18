@@ -66,13 +66,12 @@ import catalogos from '@/enums/catalogos'
 
 import productsList from '@/graphql/queries/productos/products.gql'
 import deleteMutation from '@/graphql/mutations/product/DeleteProduct.gql'
+import updateMutation from '@/graphql/mutations/product/UpdateProduct.gql'
 
 export default {
   components: { ApolloCrud, ApolloSelect, EditProductsForm },
   layout: 'dashboard/DashboardLayout',
   mounted(){
-    // this.updateMethod = this.$refs.productsTable.updateCache
-
     this.$root.$on('bv::collapse::state', (collapseId, isJustShown) => {
       this[`${collapseId}BttnIcon`] = isJustShown
     })
@@ -119,7 +118,15 @@ export default {
   },
   methods: {
     editOrDelete(e){
-      switch (this.$store.state.action) {
+      this.$store.dispatch('manageAction', 
+                            {
+                              action: e.action, 
+                              mutation: this.getMutation(e.action),
+                              selectedItem: e.item
+                            }
+                          )
+
+      switch (e.action) {
         case actions.DELETE:
           this.deleteProduct( this.$store.state.selectedItem )
           break;
@@ -130,19 +137,32 @@ export default {
           break;
       }
     },
+    getMutation(action){
+      switch (action) {
+          case actions.CREATE: 
+              return createMutation
+              break
+          case actions.UPDATE:
+              return updateMutation
+              break;
+          case actions.DELETE:
+              return deleteMutation 
+              break
+      }
+    },
     onSelectChange(e) { this.filter = e && e.target ? e.target.value : e; console.log(this.filter);
     },
     productCreated(e){
-      // let mixin = this.$swal.mixin({
-      //     toast: true,
-      //     position: 'top-end',
-      //     showConfirmButton: false,
-      //     timer: 4000,
-      //     timerProgressBar: true,
-      //   })
+    let mixin = this.$swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4000,  
+        timerProgressBar: true,
+      })
 
-      //   mixin.fire('El Producto ha sido creado correctamente', '', 'success')
-      console.log("Exito");
+      const op = e.action === actions.CREATE ? 'creado' : 'actualizado' ;
+      mixin.fire(`El Producto ha sido ${op}`, '', 'success')
       
     },
     productCreationError(e) {

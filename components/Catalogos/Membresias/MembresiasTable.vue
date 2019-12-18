@@ -1,8 +1,6 @@
 <template>
     <apollo-crud :baseVariablesObj="baseObj"
-                  :catalogo="getCatalogo"
                   :table_fields="fields"
-                  :query="query"
                   :createMutation="createM"
                   :updateMutation="updateM"
                   :deleteMutation="deleteM"></apollo-crud>
@@ -22,6 +20,10 @@ export default {
     name: 'membresias-table',
     components: {
         ApolloCrud
+    },
+    mounted(){
+        // this.$store.commit('changeQuery', memberships);
+        this.$store.commit('changeCatalog', catalogos.MEMBRESIAS);
     },
     data() {
         return {
@@ -44,14 +46,10 @@ export default {
                     label: ''
                 }
             ],
-            query: memberships,
             createM: createMutation,
             updateM: updateMutation,
             deleteM: deleteMutation
         }
-    },
-    computed: {
-        getCatalogo: () => catalogos.MEMBRESIAS
     },
 }
 </script>

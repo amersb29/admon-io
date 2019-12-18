@@ -1,7 +1,7 @@
 <template>
-          <ApolloQuery :query="require(`@/graphql/queries/${catalogo.folder}/${catalogo.id}.gql`)"
-                       :context="apolloContext"
-                    @result="setBusy($event, false)">
+    <ApolloQuery :query="require(`@/graphql/queries/${catalogo.folder}/${catalogo.id}.gql`)"
+                 :context="apolloContext"
+                 @result="setBusy($event, false)">
         <template v-slot="{ result: { loading, error, data } }">
             <!-- Loading -->
             <div v-if="loading" class="loading apollo">Loading...</div>
@@ -131,13 +131,12 @@ export default {
     beforeMount(){
         this.token = localStorage.getItem('apollo-token')
     },
-    created(){
+    created(){debugger
         this.resetSelectedItem()  
     },
     props: {
         
         baseVariablesObj: {},
-        catalogo: null,
         filter: null,
         fixedTable: {
             type: Boolean,
@@ -156,7 +155,6 @@ export default {
         createMutation: null,
         deleteMutation: null,
         updateMutation: null,
-        query: null,
         
     },
     data() {
@@ -191,6 +189,9 @@ export default {
         },
         isFormHeaderShown() {
             return this.showFormHeader
+        },
+        catalogo() {
+            return this.$store.state.catalog
         }
     },
     methods: {
@@ -216,15 +217,6 @@ export default {
             })
         },
         editOrDelete( item, action ) {
-            this.$store.dispatch('manageAction', 
-                                 {
-                                    action, 
-                                    mutation: this.getMutation(action),
-                                    selectedItem: item
-                                 })
-            this.$store.commit('changeAction', action);
-            this.$store.commit('changeSelectedItem', item);
-
             // TODO - Se borrará en el futuro no muy lejano
             this.currentAction = action 
             this.selectedItem = {...item}
@@ -232,19 +224,6 @@ export default {
         },
         getItems( data ){
             return data[this.catalogo.id]
-        },
-        getMutation(action){
-          switch (action) {
-              case actions.CREATE: 
-                  return this.createMutation
-                  break
-              case actions.UPDATE:
-                  return this.updateMutation
-                  break;
-              case actions.DELETE:
-                  return this.deleteMutation 
-                  break
-          }
         },
         getMessage(catalogo){
             let action = null
@@ -261,16 +240,13 @@ export default {
                   break
             }
             
-            let mensaje = `${catalogo.articulo_singular} ${catalogo.singular} ha sido ${action} correctamente`
+            let mensaje = `${catalogo.articulo_singular} ${catalogo.singular} ha sido ${action}`
             let genero = catalogo.id === catalogos.MEMBRESIAS.id ? 'a' : 'o' ;
             return mensaje.replace('#', genero);
         },
         getPlaceholder(field) {
             let placeholder = `${propiedades[field.key]} de ${this.catalogo.articulo_singular.toLowerCase()} ${this.catalogo.singular.charAt(0).toUpperCase() + this.catalogo.singular.slice(1)}`
             return placeholder.replace('de el', 'del')
-        },
-        getQuery(){debugger 
-            return this.queryString
         },
         getVariables(){
             let baseVariablesObj = { ...this.selectedItem }

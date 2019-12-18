@@ -107,7 +107,6 @@ export default {
     name: 'edit-products-form',
     components: {ApolloSelect},
     created(){
-        this.createProductsMut = createProducts;
         this.resetForm();
 
         this.$store.watch(
@@ -120,7 +119,6 @@ export default {
     },
     data() {
         return {
-            createProductsMut: null,
             emptyProduct: {
                 description: '',
                 id: '',
@@ -135,14 +133,12 @@ export default {
                 is_preview: 0,
                 vimeo_id: null
             },
-            // product: null,
             selValue: "1",
             toggleImg: false,
         }
     },
     methods: {
         addVideo() {
-            // this.$store.state.selectedItem.videos.push(Object.assign({},this.emptyVideoObj));
             this.$store.commit('addVideo', Object.assign({},this.emptyVideoObj));
         },
         getVimeoId(index){
@@ -166,22 +162,22 @@ export default {
                 event.stopPropagation()
             }else {
                 this.$apollo.mutate({
-                    mutation: this.$store.getters.mutation, //this.getMutation(this.action),
+                    mutation: this.$store.getters.mutation,
                     variables: this.getVariables(this.$store.state.selectedItem),
                     update: this.updateMethod
                 }).then((data) => {
+                    this.$emit('product-created', {action: this.$store.state.action})
                     this.resetForm();
-                    this.$emit('product-created')
                 }).catch((error) => {
                     console.log(error)
                     this.$emit('product-creation-error')
                 })
             }
 
-            form.classList.add('was-validated');
+            form.classList.add('was-validated')
         },
         async fillProductForm(idx) {
-            if (idx !== -1) {
+            if (!!+idx && idx !== -1) {
                 const res = await this.$apollo.query({
                     query: product,
                     variables: {
@@ -190,7 +186,6 @@ export default {
                 })
 
                 this.$store.commit('changeSelectedItem', res.data.product);
-                // this.$store.commit('updateVideoList', res.data.product.videos);
 
                 this.$refs.tpProducto.optSelected = this.$store.getters.tipoProductoId;
 
@@ -200,17 +195,6 @@ export default {
         
                 this.scrollToTop()
             }
-        },
-        getMutation( action ) { 
-            switch (action) {
-                case actions.CREATE:
-                    return this.createProductsMut
-                    break;
-                case actions.UPDATE:
-                    return updateProducts
-                    break;
-            }
-            
         },
         getVariables( {id, name, description, tipoProducto: {id: tipo_producto_id} } ){ //TODO
             
@@ -244,6 +228,11 @@ export default {
         onTpProducto(e) { this.$store.commit('updateTipoProducto', e) },
         resetForm(){
             this.toggleImg = false
+
+            if(this.$refs.productsForm && this.$refs.productsForm.classList){
+                this.$refs.productsForm.classList.remove('was-validated')
+            }
+
             this.$store.dispatch('manageAction', 
                                  {
                                     action: actions.CREATE, 

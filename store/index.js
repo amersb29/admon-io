@@ -49,6 +49,7 @@ export const mutations = {
         state.selectedItem.videos[idx].is_preview = 1
     },
     setVideoName(state, {idx, newName}){
+        delete state.selectedItem.videos[idx].__typename
         state.selectedItem.videos[idx].name = newName
     },
     updateVideoList(state, videoList) {
@@ -73,9 +74,33 @@ export const getters = {
     docName: state => state.document ? state.document.name : undefined,
     imageName: state => state.image ? state.image.name : undefined,
     mutation: state => state.mutation ? state.mutation : undefined,
+
+    query: state => state.query ? state.query : undefined,
+    // mutation_variables: null,
 }
 
 export const actions = {
+    // executeMutation({ getters }) {
+    //     this.$apollo.mutate({
+    //         mutation: getters.mutation,
+    //         variables: getters.mutation_variables,
+    //         update: this.updateCache
+    //     }).then((data) => {                
+    //         let mixin = this.$swal.mixin({
+    //             toast: true,
+    //             position: 'top-end',
+    //             showConfirmButton: false,
+    //             timer: 4000,
+    //             timerProgressBar: true,
+    //         })
+
+    //         mixin.fire(this.getMessage(this.catalogo), '', 'success')
+
+    //         this.resetSelectedItem()
+    //     }).catch((error) => {
+    //         // console.log("ERROR", error)
+    //     })
+    // },
     manageAction({state, commit}, {action, mutation, selectedItem}){
         commit('changeAction', action)
         commit('changeMutation', mutation)
@@ -92,6 +117,7 @@ export const actions = {
         if( idx === 0 ) {
             commit('setVideoAsPreview', idx)
         }
+        
         commit('setVideoName', {idx, newName})
     },
     updateCache( { state, getters } , { store, res } ){
