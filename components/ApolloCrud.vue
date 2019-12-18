@@ -15,7 +15,8 @@
                             v-model="currentPage"
                             :per-page="perPage"
                             size="sm"
-                            :total-rows="totalRows"></b-pagination>
+                            :total-rows="totalRows"
+                            v-show="pagination"></b-pagination>
                 <b-table borderless
                         :busy="isBusy"
                         :current-page="currentPage"
@@ -33,16 +34,15 @@
                                 <b-input hidden 
                                         name="id"
                                         v-if="field.key === 'id'"
-                                        v-model="selectedItem.id"/>
+                                        v-model="formItem.id"/>
 
-                                <b-input class="form-control" 
-                                        :id="field.key"
-                                        :name="field.key" 
+                                <b-input class="form-control"   
+                                      :name="field.key" 
                                         :placeholder="`${getPlaceholder(field)}`"
                                         :ref="field.key"
                                         type="text"
                                         v-if="field.key !== 'id' && field.key !== 'acciones'"
-                                        v-model="selectedItem[field.key]"/>
+                                        v-model="formItem[field.key]"/>
 
                                 <div v-if="field.key === 'acciones'" class="buttonsContainer">
                                     <b-button :variant="buttonVariant" 
@@ -131,14 +131,18 @@ export default {
     beforeMount(){
         this.token = localStorage.getItem('apollo-token')
     },
-    created(){debugger
-        this.resetSelectedItem()  
+    created(){
+        this.resetSelectedItem()
     },
     props: {
-        
         baseVariablesObj: {},
+        // catalogo: null,
         filter: null,
         fixedTable: {
+            type: Boolean,
+            default: true
+        },
+        pagination: {
             type: Boolean,
             default: true
         },
@@ -151,18 +155,12 @@ export default {
             default: true
         },
         table_fields: null,
-
-        createMutation: null,
-        deleteMutation: null,
-        updateMutation: null,
         
     },
     data() {
         return {
-            actions: actions,
-            currentAction: -1, 
+            formItem: null,
             isBusy: true,
-            selectedItem: null,
             token: null,
 
             currentPage: 1,
@@ -171,6 +169,9 @@ export default {
         }
     },
     computed: {
+        actions() {
+            return actions
+        },
         actionButton() {
             return this.currentAction === actions.CREATE ? 'save' : 'pencil' 
         },
@@ -190,8 +191,14 @@ export default {
         isFormHeaderShown() {
             return this.showFormHeader
         },
+        currentAction() {
+            return this.$store.state.action
+        },
+        selectedItem() {
+            return this.$store.state.selectedItem
+        },
         catalogo() {
-            return this.$store.state.catalog
+            return this.$store.getters.catalog
         }
     },
     methods: {
@@ -206,7 +213,6 @@ export default {
                     position: 'top-end',
                     showConfirmButton: false,
                     timer: 4000,
-                    timerProgressBar: true,
                 })
 
                 mixin.fire(this.getMessage(this.catalogo), '', 'success')
@@ -217,10 +223,12 @@ export default {
             })
         },
         editOrDelete( item, action ) {
-            // TODO - Se borrará en el futuro no muy lejano
-            this.currentAction = action 
-            this.selectedItem = {...item}
-            this.$emit('onEditOrDelete', {action: this.currentAction, item: this.selectedItem})
+            this.formItem = Object.assign({}, item) //para los catálogos
+            this.$store.dispatch('manageAction', { action, item } ) // para Usuarios y Productos
+            this.$emit('onEditOrDelete', { action })
+        },
+        fieldChanged(value, key){            
+            this.$store.commit('changeField', {key, value})
         },
         getItems( data ){
             return data[this.catalogo.id]
@@ -249,7 +257,7 @@ export default {
             return placeholder.replace('de el', 'del')
         },
         getVariables(){
-            let baseVariablesObj = { ...this.selectedItem }
+            let baseVariablesObj = Object.assign({}, this.formItem)
 
            switch (this.currentAction) {
               case actions.CREATE:
@@ -267,8 +275,10 @@ export default {
           return baseVariablesObj
         },
         resetSelectedItem() {
-            this.selectedItem = {...this.baseVariablesObj}
-            this.currentAction = actions.CREATE
+            this.formItem = Object.assign({}, this.baseVariablesObj )
+            this.$store.commit('changeSelectedItem', Object.assign({}, this.baseVariablesObj ) )
+            this.$store.commit('changeAction', actions.CREATE)
+            this.$emit('onResetForm', {action: actions.CREATE})
         },
         setBusy($event, state) {
             this.isBusy = state

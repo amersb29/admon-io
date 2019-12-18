@@ -9,9 +9,10 @@
       "webRoot": "${workspaceFolder}",
       "breakOnLoad": true,
       "sourceMaps": true,
+      "port": 9877,
       "sourceMapPathOverrides": {
         "webpack:///*": "${webRoot}/*"
-      }
+      },
     },
     {
       "type": "node",

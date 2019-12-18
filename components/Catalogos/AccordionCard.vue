@@ -38,7 +38,9 @@ export default {
         group: String,
         title: String,
         visible: Boolean,
-        text: String
+        text: String,
+        catalogo: Object,
+        query: Object,
     },
     computed: {
        table () {
@@ -50,7 +52,10 @@ export default {
     },
     methods: {
        showContent() {
-           this.$root.$emit('bv::toggle::collapse', this.id)
+          this.$root.$emit('bv::toggle::collapse', this.id)
+
+          this.$store.commit('changeQuery', this.query);
+          this.$store.commit('changeCatalog', this.catalogo);
        },
     }
 }

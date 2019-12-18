@@ -39,7 +39,6 @@
                 <b-card>
                   <apollo-crud ref="productsTable"
                           :catalogo="getCatalogo"
-                          :deleteMutation="deleteM"
                           :filter="filter"
                           :fixedTable="false"
                           @onEditOrDelete="editOrDelete"
@@ -103,7 +102,7 @@ export default {
         ],
         filter: null,
         query: productsList,
-        deleteM: deleteMutation,
+        // deleteM: deleteMutation,
 
         createProductBttnIcon: false,
         filterProductBttnIcon: false,
@@ -118,17 +117,17 @@ export default {
   },
   methods: {
     editOrDelete(e){
-      this.$store.dispatch('manageAction', 
-                            {
-                              action: e.action, 
-                              mutation: this.getMutation(e.action),
-                              selectedItem: e.item
-                            }
-                          )
+      // this.$store.dispatch('manageAction', 
+      //                       {
+      //                         action: e.action, 
+      //                         mutation: this.getMutation(e.action),
+      //                         selectedItem: e.item
+      //                       }
+      //                     )
 
       switch (e.action) {
         case actions.DELETE:
-          this.deleteProduct( this.$store.state.selectedItem )
+          this.showDeleteProductAlert()
           break;
         case actions.UPDATE:
           if( !this.$refs.createProduct.show ) {
@@ -175,18 +174,19 @@ export default {
       }
       this.showNotification( options )
     },
-    deleteProduct( product ) {
+    showDeleteProductAlert() {
         this.$swal(
           {
             title: '<i class="fa fa-exclamation-circle" style="font-size: 7rem !important; color: #F3BB45 !important; width: 100%;"></i> ¡Cuidado!',
-            text: `¿Desea borrar el producto ${product.name}?`,
+            text: `¿Desea borrar el producto ${this.$store.state.selectedItem.name}?`,
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'Sí, bórralo!',
             cancelButtonColor: '#d33',
             cancelButtonText: 'Cancelar'
           }).then( result => {
-            if(result.value){                  
+            if(result.value){      
+              this.$store.commit('changeMutation', deleteMutation)            
               this.$refs.productsTable.executeMutation();
             }
           })

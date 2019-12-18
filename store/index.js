@@ -1,4 +1,5 @@
 import acts from '@/enums/actions'
+import cat from '@/enums/catalogos'
 
 export const state = () => ({
     action: 0,
@@ -17,6 +18,9 @@ export const mutations = {
     },
     changeSelectedItem(state, selectedItem) {
         state.selectedItem = selectedItem
+    },
+    changeField(state, {key, value}){
+        state.selectedItem[key] = value
     },
     changeCatalog(state, catalog){
         state.catalog = catalog
@@ -68,6 +72,7 @@ export const getters = {
     tipoProductoId: state => state.selectedItem ? state.selectedItem.tipoProducto.id : 1,
     videos: state => state.selectedItem.videos ? state.selectedItem.videos.filter( video => video.vimeo_id !== null) : [],
     videosLength: state => state.selectedItem ? state.selectedItem.videos.length : 0,
+    catalog: state => state.catalog ? state.catalog : cat.MEMBRESIAS ,
     catalogId: state => state.catalog ? state.catalog.id : undefined ,
     vimeoId: state => idx => state.selectedItem.videos[idx].vimeo_id,
     fileList: state => state.fileList ? state.fileList : [],
@@ -76,35 +81,15 @@ export const getters = {
     mutation: state => state.mutation ? state.mutation : undefined,
 
     query: state => state.query ? state.query : undefined,
-    // mutation_variables: null,
 }
 
 export const actions = {
-    // executeMutation({ getters }) {
-    //     this.$apollo.mutate({
-    //         mutation: getters.mutation,
-    //         variables: getters.mutation_variables,
-    //         update: this.updateCache
-    //     }).then((data) => {                
-    //         let mixin = this.$swal.mixin({
-    //             toast: true,
-    //             position: 'top-end',
-    //             showConfirmButton: false,
-    //             timer: 4000,
-    //             timerProgressBar: true,
-    //         })
-
-    //         mixin.fire(this.getMessage(this.catalogo), '', 'success')
-
-    //         this.resetSelectedItem()
-    //     }).catch((error) => {
-    //         // console.log("ERROR", error)
-    //     })
-    // },
-    manageAction({state, commit}, {action, mutation, selectedItem}){
+    manageAction({state, commit}, {action, item , mutation}){
         commit('changeAction', action)
-        commit('changeMutation', mutation)
-        commit('changeSelectedItem', selectedItem)
+        commit('changeSelectedItem', item)
+        if(mutation){
+            commit('changeMutation', mutation)
+        }
     },
     manageFile({state, commit}, file){
         let idx = (/\.(gif|jpg|jpeg|tiff|png)$/i).test(file.name) ? 0 : 1
