@@ -65,7 +65,6 @@ import productsList from '@/graphql/queries/productos/products.gql'
 import deleteMutation from '@/graphql/mutations/product/DeleteProduct.gql'
 import updateMutation from '@/graphql/mutations/product/UpdateProduct.gql'
 import Crud from '../../components/Crud.vue'
-import { debuglog } from 'util'
 
 export default {
   components: { ApolloCrud, ApolloSelect, EditProductsForm },
@@ -91,6 +90,8 @@ export default {
         createProductBttnIcon: false,
         filterProductBttnIcon: false,
         productsTableBttnIcon: true,
+        updateMutation,
+        deleteMutation,
       }
   },
   computed: {
@@ -99,7 +100,7 @@ export default {
     },
   },
   methods: {
-    editOrDelete(e){debugger
+    editOrDelete(e){
       this.changeMutation(e)
       switch (e.action) {
         case actions.DELETE:

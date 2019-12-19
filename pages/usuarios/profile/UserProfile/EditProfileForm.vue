@@ -8,7 +8,7 @@
                       label="Nombre"
                       placeholder="Escriba el Nombre"
                       required
-                      v-model="user.firstName">
+                      v-model="firstName">
             </fg-input>
           </b-col>
           <b-col md="4">
@@ -16,7 +16,7 @@
                       label="Apellido(s)"
                       placeholder="Escriba el/los Apellido(s)"
                       required
-                      v-model="user.lastName">
+                      v-model="lastName">
             </fg-input>
           </b-col>
           <b-col md="4">
@@ -24,7 +24,7 @@
                       label="Correo electrónico"
                       placeholder="Escriba el Correo electrónico"
                       required
-                      v-model="user.email">
+                      v-model="email">
             </fg-input>
           </b-col>
         </b-row>
@@ -34,7 +34,7 @@
                       label="Contraseña"
                       placeholder="Escriba la Contraseña"
                       required
-                      v-model="user.password">
+                      v-model="password">
             </fg-input>
           </b-col>
           <b-col md="4">
@@ -72,7 +72,7 @@
           </b-col>
           <b-col md="4">
             <label for="state">Estado</label>
-            <b-form-select id="state" class="custom-dropdown" v-model="user.state">
+            <b-form-select id="state" class="custom-dropdown" v-model="state">
               <option value="0" selected>Inactivo</option>
               <option value="1" >Activo</option>
             </b-form-select>
@@ -87,7 +87,7 @@
               gqlQuery="roles"
               optionText="name"
               multiple
-              :arrayModel="user.roles"
+              :arrayModel="roles"
               @change="onSelectChange($event, 'roles')"
             />
           </b-col>
@@ -96,7 +96,7 @@
               <label>Notas</label>
               <textarea rows="5" class="form-control border-input"
                         placeholder="Here can be your description"
-                        v-model="user.aboutMe">
+                        v-model="notes">
               </textarea>
             </div>
           </b-col>
@@ -116,10 +116,12 @@
 </template>
 
 <script>
-import ApolloSelect from '../../../../components/ApolloSelect.vue';
+import ApolloSelect from '@/components/ApolloSelect.vue';
 import createUserMut from '@/graphql/mutations/user/CreateUser.gql';
+import EditForm from '@/components/Mixins/EditForm.vue';
 
 export default {
+  mixins: [EditForm],
   props: {
     formTitle: String,
     textButton: String,
@@ -127,6 +129,9 @@ export default {
   },
   components: {
     ApolloSelect
+  },
+  created(){
+    this.$store.commit('changeSelectedItem', Object.assign({}, this.user))
   },
   data() {
     return {
@@ -144,10 +149,65 @@ export default {
     };
   },
   computed: {
-    
+    firstName: {
+        get () {
+            return this.$store.getters.field('firstName')
+        },
+        set (value) {
+            this.$store.commit('changeField', {key: 'firstName', value})
+        }
+    },
+    lastName: {
+        get () {
+            return this.$store.getters.field('lastName')
+        },
+        set (value) {
+            this.$store.commit('changeField', {key: 'lastName', value})
+        }
+    },
+    email: {
+        get () {
+            return this.$store.getters.field('email')
+        },
+        set (value) {
+            this.$store.commit('changeField', {key: 'email', value})
+        }
+    },
+    password: {
+        get () {
+            return this.$store.getters.field('password')
+        },
+        set (value) {
+            this.$store.commit('changeField', {key: 'password', value})
+        }
+    },
+    state: {
+        get () {
+            return this.$store.getters.field('state')
+        },
+        set (value) {
+            this.$store.commit('changeField', {key: 'state', value})
+        }
+    },
+    roles: {
+        get () {
+            return this.$store.getters.field('roles')
+        },
+        set (value) {
+            this.$store.commit('changeField', {key: 'roles', value})
+        }
+    },
+    notes: {
+        get () {
+            return this.$store.getters.field('notes')
+        },
+        set (value) {
+            this.$store.commit('changeField', {key: 'notes', value})
+        }
+    },
   },
   methods: {
-    onSelectChange(e, attr) { this.user[ attr ] = e; },
+    onSelectChange(value, key) { this.$store.commit('changeField', {key, value}) /*this.user[ attr ] = e;*/ },
     createUser(){
       const form = this.$refs.createUsrForm;
 
@@ -156,17 +216,17 @@ export default {
       }else {
         this.$apollo.mutate({
           // Query
-          mutation: createUserMut,
+          mutation: this.$store.getters.mutation,
           // Parameters
           variables: {
-            firstName: this.user.firstName,
-            lastName:  this.user.lastName,
-            email:     this.user.email,
-            password:  this.user.password,
-            mem_id:    this.user.membership,
-            country_id: this.user.country,
-            state: this.user.state,
-            roles: this.user.roles,
+            firstName: this.$store.getters.field('firstName'), //this.user.firstName,
+            lastName:  this.$store.getters.field('lastName'), //this.user.lastName,
+            email:     this.$store.getters.field('email'), //this.user.email,
+            password:  this.$store.getters.field('password'), //this.user.password,
+            mem_id:    this.$store.getters.field('membership'), //this.user.membership,
+            country_id: this.$store.getters.field('country'), //this.user.country,
+            state: this.$store.getters.field('state'), //this.user.state,
+            roles: this.$store.getters.field('roles'), //this.user.roles,
           },
           update: this.updateMethod
         }).then((data) => {

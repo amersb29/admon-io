@@ -74,6 +74,7 @@ export const getters = {
     document: state => state.document ? state.document : undefined,
     docName: state => state.document ? state.document.name : undefined,
     fileList: state => state.fileList ? state.fileList : [],
+    field: state => key => state.selectedItem ? state.selectedItem[key] : undefined,
     image: state => state.image ? state.image : undefined,
     imageName: state => state.image ? state.image.name : undefined,
     mutation: state => state.mutation ? state.mutation : undefined,

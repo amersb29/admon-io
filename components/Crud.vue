@@ -30,7 +30,7 @@ export default {
                     mutation = this.deleteMutation 
                     break
             }
-debugger
+
             this.$store.commit('changeMutation', mutation )
         },
     }

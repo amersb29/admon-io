@@ -79,10 +79,11 @@
                             Agregar Video
                     </b-button>
                     <b-button-group>
-                        <b-button variant="primary" class="formButtons" @click="createProduct()">
-                            <i class="fa fa-save fa-lg"></i>
-                            Salvar
+                        <b-button :variant="buttonVariant" class="formButtons" @click="createProduct()">
+                            <i :class="`fa fa-${actionButton} fa-lg`"></i>
+                            {{ actionButtonTxt }}
                         </b-button>
+
                         <b-button variant="danger" class="formButtons" @click="resetForm()">
                             <i class="fa fa-ban fa-lg"></i>
                             Cancelar
@@ -220,7 +221,7 @@ export default {
 
             let variables = Object.assign({}, {id, name, description, tipo_producto_id,  image, document, new_videos, old_videos, files });
 
-            if( this.action === actions.CREATE )
+            if( this.$store.state.action === actions.CREATE )
                 delete variables.id
 
             return variables
@@ -263,8 +264,14 @@ export default {
         }
     },
     computed: {
-        action() {
-            return this.$store.state.action
+        actionButton() {
+            return this.$store.state.action === actions.CREATE ? 'save' : 'pencil' 
+        },
+        actionButtonTxt() {
+            return this.$store.state.action === actions.CREATE ? 'Salvar' : 'Actualizar' 
+        },
+        buttonVariant(){
+            return this.$store.state.action === actions.CREATE ? 'primary' : 'warning'
         },
         product() {
             return this.$store.state.selectedItem

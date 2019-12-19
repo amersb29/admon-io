@@ -33,6 +33,10 @@ export default {
     components: {
         AccordionCard
     },
+    created(){
+      this.$store.commit('changeQuery', memberships);
+      this.$store.commit('changeCatalog', _catalogos.MEMBRESIAS);
+    },
     data() {
       return {
         catalogos: [

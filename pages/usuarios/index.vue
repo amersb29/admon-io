@@ -27,12 +27,7 @@
               <b-collapse id="usersTable" class="mt-2" :visible="usersTableBttnIcon">
                 <b-card>
                   <apollo-crud ref="userTable"
-                          :catalogo="getCatalogo"
                           :table_fields="fields"
-                          :query="query"
-                          :createMutation="createM"
-                          :updateMutation="updateM"
-                          :deleteMutation="deleteM"
                           :showDetailsButton="true"
                           :showFormHeader="false"
                           :fixedTable="false"
@@ -70,36 +65,22 @@ export default {
     this.$root.$on('bv::collapse::state', (collapseId, isJustShown) => {
       this[`${collapseId}BttnIcon`] = isJustShown
     })
+
+    this.$store.commit('changeQuery', usersList);
+    this.$store.commit('changeCatalog', catalogos.USUARIOS);
+  
   },
   data() {
       return {
         
         fields: [
-          {
-            key: 'id',
-            sortable: true
-          },
-          {
-            key: 'name',
-            label: 'Nombre',
-            sortable: true
-          },
-          {
-            key: 'membership.name',
-            label: 'Membresía',
-            sortable: true
-          },
-          {
-            key: 'roles',
-            label: 'Roles',
-            sortable: true
-          },
-          {
-              key: 'acciones',
-              label: ''
-          }
+          { key: 'id', sortable: true },
+          { key: 'name', label: 'Nombre', sortable: true },
+          { key: 'membership.name', label: 'Membresía', sortable: true },
+          { key: 'roles', label: 'Roles', sortable: true },
+          { key: 'acciones', label: '' }
         ],
-        query: usersList,
+        // query: usersList,
         createM: createMutation,
         updateM: updateMutation,
         deleteM: deleteMutation,
@@ -113,7 +94,6 @@ export default {
     tableClass() {
       return `table-striped`;
     },
-    getCatalogo: () => catalogos.USUARIOS,
   },
   methods: {
     editOrDelete(e){
