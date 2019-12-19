@@ -16,7 +16,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <b-collapse id="createUser" class="mt-2">
+              <b-collapse ref="createUser" class="mt-2">
                 <edit-profile-form ref="form-create-user" 
                                   textButton="Registrar Usuario" 
                                   @user-created="userCreated"
@@ -51,15 +51,17 @@ import actions from '@/enums/actions'
 import catalogos from '@/enums/catalogos'
 
 import usersList from '@/graphql/queries/usuarios/users.gql';
-import createMutation from '@/graphql/queries/usuarios/users.gql';
+
 import updateMutation from '@/graphql/queries/usuarios/users.gql';
 import deleteMutation from '@/graphql/mutations/user/DeleteUser.gql';
 
 import EditProfileForm from './profile/UserProfile/EditProfileForm.vue'
+import Crud from '../../components/Crud.vue'
 
 export default {
   components: { ApolloCrud, EditProfileForm },
   layout: 'dashboard/DashboardLayout',
+  mixins: [Crud],
   mounted(){
     this.updateMethod = this.$refs.userTable.updateCache
     this.$root.$on('bv::collapse::state', (collapseId, isJustShown) => {
@@ -81,7 +83,7 @@ export default {
           { key: 'acciones', label: '' }
         ],
         // query: usersList,
-        createM: createMutation,
+        // createM: createMutation,
         updateM: updateMutation,
         deleteM: deleteMutation,
         updateMethod: null,
@@ -97,8 +99,16 @@ export default {
   },
   methods: {
     editOrDelete(e){
-      if(e.action === actions.DELETE) {
-        this.deleteUser( e.item )
+      this.changeMutation(e)
+      switch (e.action) {
+        case actions.DELETE:
+          this.showDeleteUserAlert()
+          break;
+        case actions.UPDATE:
+          if( !this.$refs.createUser.show ) {
+            this.$refs.createUser.show = true;
+          }
+          break;
       }
     },
     showDetails(e) {
@@ -126,7 +136,7 @@ export default {
       }
       this.showNotification( options )
     },
-    deleteUser( user ) {
+    showDeleteUserAlert( user ) {
         this.$swal(
           {
             title: '<i class="fa fa-exclamation-circle" style="font-size: 7rem !important; color: #F3BB45 !important; width: 100%;"></i> ¡Cuidado!',

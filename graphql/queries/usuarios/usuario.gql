@@ -1,0 +1,19 @@
+query {
+  users{
+    country {
+        id
+    }
+    email
+    first_name
+    id
+    last_name
+    membership {
+      id
+    }
+    password
+    roles{
+      id
+    }
+    state
+  }
+}

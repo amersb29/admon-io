@@ -116,12 +116,13 @@
 </template>
 
 <script>
+import actions from '@/enums/actions'
 import ApolloSelect from '@/components/ApolloSelect.vue';
-import createUserMut from '@/graphql/mutations/user/CreateUser.gql';
-import EditForm from '@/components/Mixins/EditForm.vue';
+
+import usuario from '@/graphql/queries/usuarios/usuario.gql'
+import createMutation from '@/graphql/mutations/user/CreateUser.gql';
 
 export default {
-  mixins: [EditForm],
   props: {
     formTitle: String,
     textButton: String,
@@ -131,7 +132,19 @@ export default {
     ApolloSelect
   },
   created(){
-    this.$store.commit('changeSelectedItem', Object.assign({}, this.user))
+    this.$store.dispatch('manageAction', 
+                                 {
+                                    action: actions.CREATE, 
+                                    mutation: createMutation,
+                                    item: Object.assign({}, this.user)
+                                 })
+    this.$store.watch(
+        (state, getters) => getters.selectedItemId,
+        (newId, oldId) => {
+            if (this.$store.state.action !== actions.DELETE)
+                this.fillUserForm( newId )
+        }
+    )
   },
   data() {
     return {
@@ -237,7 +250,23 @@ export default {
       }
       form.classList.add('was-validated');
     },
+    async fillUserForm(idx) {
+      if (!!+idx && idx !== -1) {
+          const res = await this.$apollo.query({
+              query: usuario,
+              variables: {
+                  id: idx
+              }
+          })
 
+          debugger
+          this.$store.commit('changeSelectedItem', res.data.user);
+
+          // this.$refs.tpProducto.optSelected = this.$store.getters.tipoProductoId;
+  
+          this.scrollToTop()
+      }
+    },
   }
 };
 </script>
