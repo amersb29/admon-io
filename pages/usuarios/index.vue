@@ -16,7 +16,7 @@
           </b-row>
           <b-row>
             <b-col>
-              <b-collapse ref="createUser" class="mt-2">
+              <b-collapse id="createUser" ref="createUser" class="mt-2">
                 <edit-profile-form ref="form-create-user" 
                                   textButton="Registrar Usuario" 
                                   @user-created="userCreated"
@@ -82,8 +82,6 @@ export default {
           { key: 'roles', label: 'Roles', sortable: true },
           { key: 'acciones', label: '' }
         ],
-        // query: usersList,
-        // createM: createMutation,
         updateM: updateMutation,
         deleteM: deleteMutation,
         updateMethod: null,

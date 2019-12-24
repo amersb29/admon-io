@@ -10,6 +10,7 @@ export const state = () => ({
     mutation: undefined,
     query: undefined,
     selectedItem: {},
+    token: null,
 })
 
 export const mutations = {
@@ -64,12 +65,16 @@ export const mutations = {
     },
     updateTipoProducto(state, id){
         state.selectedItem.tipoProducto = {id}
+    },
+    updateToken(state, token){
+        state.token = token
     }
 }
 
 export const getters = {
     catalog: state => state.catalog ? state.catalog : cat.MEMBRESIAS ,
     catalogId: state => state.catalog ? state.catalog.id : undefined ,
+    gqlContext: state => state.token ? {headers: {'Authorization': `Bearer ${localStorage.getItem('apollo-token')}`}}  : undefined,
     description: state => state.selectedItem ? state.selectedItem.description : undefined,
     document: state => state.document ? state.document : undefined,
     docName: state => state.document ? state.document.name : undefined,

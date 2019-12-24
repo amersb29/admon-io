@@ -128,9 +128,6 @@ import propiedades from '@/enums/propiedades'
 
 export default {
     name: 'apollo-crud',
-    beforeMount(){
-        this.token = localStorage.getItem('apollo-token')
-    },
     created(){
         this.resetSelectedItem()
     },
@@ -161,7 +158,6 @@ export default {
         return {
             formItem: null,
             isBusy: true,
-            token: null,
 
             currentPage: 1,
             perPage: 15,
@@ -176,7 +172,7 @@ export default {
             return this.currentAction === actions.CREATE ? 'save' : 'pencil' 
         },
         apolloContext() {
-          return {headers: {'Authorization': `Bearer ${this.token}`}}        
+          return this.$store.getters.gqlContext
         },
         buttonVariant(){
             return this.currentAction === actions.CREATE ? 'primary' : 'warning'

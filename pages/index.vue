@@ -72,7 +72,7 @@ export default {
             mutation: loginMut,
             variables: { username: this.loginObj.username, password: this.loginObj.password}
           }).then( ( {data: { login = null } } = res) => login )
-
+          this.$store.commit('updateToken', res.access_token)
           localStorage.setItem('apollo-token', res.access_token)
           localStorage.setItem('user.id', res.user.id)
           localStorage.setItem('user.first_name', res.user.first_name)

@@ -3,10 +3,11 @@ query {
     id
     first_name
     last_name
-    state
     membership {
       name
     }
+    password
+    state
     roles{
       name
     }

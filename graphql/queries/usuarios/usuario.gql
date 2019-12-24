@@ -1,5 +1,5 @@
-query {
-  users{
+query($idx: ID!) {
+  user( id: $idx){
     country {
         id
     }

@@ -113,7 +113,8 @@ export default {
           break;
       }
     },
-    onSelectChange(e) { this.filter = e && e.target ? e.target.value : e; console.log(this.filter);
+    onSelectChange(e) { 
+      this.filter = e && e.target ? e.target.value : e;
     },
     productCreated(e){
     let mixin = this.$swal.mixin({

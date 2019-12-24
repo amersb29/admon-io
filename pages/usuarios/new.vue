@@ -19,17 +19,9 @@
 <script>
 export default {
     layout: 'dashboard/DashboardLayout',
-    beforeMount(){debugger
-        this.token = localStorage.getItem('apollo-token')
-    },
-    data(){
-        return {
-            token: null
-        }
-    },
     computed: {
         apolloContext() {
-            return {headers: {'Authorization': `Bearer ${this.token}`}}        
+            return this.$store.getters.gqlContext
         }
     }
 }
