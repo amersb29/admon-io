@@ -1,9 +1,11 @@
 mutation(
     $id: ID!
     $description: String!
+    $price: Float!
 ){
-    res: updateTipoProducto(id: $id, description: $description){
+    res: updateTipoProducto(id: $id, description: $description, price: $price){
         id
         description
+        price
     }
 }

@@ -18,10 +18,11 @@ export default {
     mixins: [Crud],
     data() {
         return {
-            baseObj: { id: 0 , description: undefined },
+            baseObj: { id: 0 , description: undefined, price: 0 },
             fields: [
                 { key: 'id', label: 'ID' },
                 { key: 'description', label: 'Descripción' }, 
+                { key: 'price', label: 'Precio' }, 
                 { key: 'acciones', label: '' }
             ],
             createMutation,

@@ -2,5 +2,6 @@ query {
     tiposProducto {
         id
         description
+        price
     }
 }
