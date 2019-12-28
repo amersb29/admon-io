@@ -1,0 +1,9 @@
+mutation(
+    $id: ID!
+){
+    res: deleteSede( input: {
+        id: $id
+    }){
+        id
+    }
+}

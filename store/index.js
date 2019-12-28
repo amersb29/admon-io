@@ -60,6 +60,12 @@ export const mutations = {
     updateVideoList(state, videoList) {
         state.selectedItem.videos = videoList
     },
+    updateArrayList(state, {key, list}) {
+        state.selectedItem[key] = list
+    },
+    addItemToList(state, {key, item}){
+        state.selectedItem[key].push(item);
+    },
     addFile(state, {idx, file}) {
         state.fileList.splice(idx, 1, file)
     },

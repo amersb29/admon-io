@@ -6,6 +6,7 @@
         <sidebar-link to="/dashboard" name="Dashboard" icon="ti-panel"/>
         <sidebar-link to="/usuarios" name="Usuarios" icon="ti-user"/>
         <sidebar-link to="/productos" name="Productos" icon="ti-package"/>
+        <sidebar-link to="/sedes" name="Sedes" icon="ti-package"/>
         <sidebar-link to="/catalogos" name="Catálogos" icon="ti-medall-alt"/>
         <sidebar-link to="/notifications" name="Notifications" icon="ti-bell"/>
       </template>

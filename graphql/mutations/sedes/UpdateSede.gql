@@ -1,0 +1,27 @@
+mutation(
+    $id: ID!
+    $countries_id: Int
+    $name: String
+    $code: String
+    $calendar: String
+    $files: [Upload!]
+){
+    res: updateSede( input: {
+        id: $id
+        countries_id: $countries_id
+        name: $name
+        code: $code
+        calendar: $calendar
+    }){
+        id
+        name
+        code
+        calendar
+        country {
+            name
+        }
+    }
+    upload(
+      files: $files
+    )
+}

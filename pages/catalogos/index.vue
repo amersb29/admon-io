@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <b-row>
-      <b-col md="8">
+      <b-col md="12">
         <div role="tablist">
             <accordion-card v-for="c of catalogos" 
                             :catalogo="c.catalogo"
