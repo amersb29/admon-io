@@ -17,17 +17,17 @@
                       required
                       v-model="name"></b-input>
           </b-form-group>
-          <b-form-group label="Código" label-for="codigo">
-              <b-input id="codigo" 
+          <b-form-group label="Código" label-for="code">
+              <b-input id="code" 
                       placeholder="Escriba el código de la sede"
                       required
-                      v-model="codigo"></b-input>
+                      v-model="code"></b-input>
           </b-form-group>
-          <b-form-group label="Calendario" label-for="calendario">
-              <b-input id="calendario" 
+          <b-form-group label="Calendario" label-for="calendar">
+              <b-input id="calendar" 
                       placeholder="Escriba el ID del calendario"
                       required
-                      v-model="calendario"></b-input>
+                      v-model="calendar"></b-input>
           </b-form-group>
         </b-card>
       </b-col>
@@ -38,7 +38,7 @@
                         :label-for="getBannerText(index, true)">
               <b-form-file
                   accept=".jpg, .png, .gif"
-                  @change="updateFileList($event)"
+                  @change="updateFileList($event, index)"
                   drop-placeholder="Drop file here..."
                   :id="getBannerText(index, true)"
                   placeholder="Seleccione la imagen"
@@ -82,8 +82,8 @@ export default {
       this.$store.watch(
           (state, getters) => getters.selectedItemId,
           (newId, oldId) => {
-              if (this.$store.state.action !== actions.DELETE)
-                  this.fillSedeForm( newId )
+              if (this.$store.state.action !== actions.DELETE){}
+                  // this.fillSedeForm( newId )
           }
       )
     },
@@ -94,10 +94,12 @@ export default {
           name: '',
           code: '',
           calendar: '',
-          banners: []
+          banners: [],
+          files: []
         },
         emptyBanner: {
-
+          image: '',
+          status: true
         }
       }
     },
@@ -122,26 +124,26 @@ export default {
             this.$store.commit('changeField', {key: 'name', value})
         }
       },
-      codigo: {
+      code: {
         get () {
-            return this.$store.getters.field('codigo')
+            return this.$store.getters.field('code')
         },
         set (value) {
-            this.$store.commit('changeField', {key: 'codigo', value})
+            this.$store.commit('changeField', {key: 'code', value})
         }
       },
-      calendario: {
+      calendar: {
         get () {
-            return this.$store.getters.field('calendario')
+            return this.$store.getters.field('calendar')
         },
         set (value) {
-            this.$store.commit('changeField', {key: 'calendario', value})
+            this.$store.commit('changeField', {key: 'calendar', value})
         }
       },
     },
     methods: {
       addBanner() {
-        this.$store.commit('addItemToList', {key: 'banners', item: Object.assign({},this.emptyVideoObj)});
+        this.$store.commit('addItemToList', {key: 'banners', item: Object.assign({},this.emptyBanner)});
       },
       createSede() {
         const form = this.$refs.sedeForm
@@ -151,14 +153,13 @@ export default {
         }else {
             this.$apollo.mutate({
                 mutation: this.$store.getters.mutation,
-                variables: this.getVariables(this.$store.state.selectedItem),
+                variables: this.$store.state.selectedItem,
                 update: this.updateMethod
             }).then((data) => {
-                this.$emit('product-created', {action: this.$store.state.action})
+                this.$emit('sede-created', {action: this.$store.state.action})
                 this.resetForm();
             }).catch((error) => {
-                console.log(error)
-                this.$emit('product-creation-error')
+                this.$emit('sede-creation-error')
             })
         }
 
@@ -193,9 +194,18 @@ export default {
           let banners = [ Object.assign({},this.emptyBanner) ];
           this.$store.commit('updateArrayList', {key: 'banners', list: banners});
       },
-      updateFileList(event) {            
-          this.$store.dispatch('manageFile', event.target.files[0])
-      }
+      updateFileList(event, idx) {            
+          this.$store.commit('updateArrObjProp', { arr: 'banners', 
+                                                   idx, 
+                                                   prop: 'image', 
+                                                   value: event.target.files[0].name
+                                                  }) 
+
+          this.$store.commit('addItemToList', {key: 'files', item: event.target.files[0]})
+      },
+      updateMethod(store, {data: { res } }){
+          this.$store.dispatch('updateCache', {store, res}) 
+      },
     }
 }
 </script>

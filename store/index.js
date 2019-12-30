@@ -74,6 +74,9 @@ export const mutations = {
     },
     updateToken(state, token){
         state.token = token
+    },
+    updateArrObjProp(state, {arr, idx, prop, value}){
+        state.selectedItem[arr][idx][prop] = value
     }
 }
 

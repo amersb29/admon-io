@@ -97,7 +97,7 @@ export default {
                 timer: 4000,  
             })
 
-            const op = e.action === actions.CREATE ? 'creada' : 'actualizada' ;
+            const op =this.$store.state.action === actions.CREATE ? 'creada' : 'actualizada' ;
             mixin.fire(`La Sede ha sido ${op}`, '', 'success')
         },
         sedeCreationError() {

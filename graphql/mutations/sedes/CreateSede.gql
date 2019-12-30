@@ -3,6 +3,7 @@ mutation(
     $name: String!
     $code: String!
     $calendar: String!
+    $banners: [CreateBannerInput!]
     $files: [Upload!]
 ){
     res: createSede( input: {
@@ -10,6 +11,7 @@ mutation(
         name: $name
         code: $code
         calendar: $calendar
+        banners: { create: $banners }
     }){
         id
         name
