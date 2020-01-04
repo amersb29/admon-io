@@ -64,7 +64,14 @@ export const mutations = {
         state.selectedItem[key] = list
     },
     addItemToList(state, {key, item}){
+        if(!state.selectedItem[key]) {
+            state.selectedItem[key] = []
+        }
         state.selectedItem[key].push(item);
+    },
+    removeItemFromList(state, {key, deletedId}){
+        const list = state.selectedItem[key]
+        list.splice(list.findIndex(p => p.id === deletedId), 1)
     },
     addFile(state, {idx, file}) {
         state.fileList.splice(idx, 1, file)
@@ -77,10 +84,11 @@ export const mutations = {
     },
     updateArrObjProp(state, {arr, idx, prop, value}){
         state.selectedItem[arr][idx][prop] = value
-    }
+    },
 }
 
 export const getters = {
+    banners: state => state.selectedItem.banners ? state.selectedItem.banners : undefined,
     catalog: state => state.catalog ? state.catalog : cat.MEMBRESIAS ,
     catalogId: state => state.catalog ? state.catalog.id : undefined ,
     gqlContext: state => state.token ? {headers: {'Authorization': `Bearer ${localStorage.getItem('apollo-token')}`}}  : undefined,

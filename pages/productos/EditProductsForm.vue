@@ -97,7 +97,8 @@
 </template>
 
 <script>
-import ApolloSelect from '../../components/ApolloSelect.vue'
+import EditForm from '@/components/Mixins/EditForm'
+import ApolloSelect from '../../components/ApolloSelect'
 import product from '@/graphql/queries/productos/product.gql'
 import createProducts from '@/graphql/mutations/product/CreateProduct.gql'
 import updateProducts from '@/graphql/mutations/product/UpdateProduct.gql'
@@ -107,16 +108,9 @@ import actions from '@/enums/actions'
 export default {
     name: 'edit-products-form',
     components: {ApolloSelect},
+    mixins: [EditForm],
     created(){
         this.resetForm();
-
-        this.$store.watch(
-            (state, getters) => getters.selectedItemId,
-            (newId, oldId) => {
-                if (this.$store.state.action !== actions.DELETE)
-                    this.fillProductForm( newId )
-            }
-        )
     },
     data() {
         return {
@@ -177,7 +171,7 @@ export default {
 
             form.classList.add('was-validated')
         },
-        async fillProductForm(idx) {
+        async fillForm(idx) {
             if (!!+idx && idx !== -1) {
                 const res = await this.$apollo.query({
                     query: product,
@@ -188,8 +182,10 @@ export default {
 
                 this.$store.commit('changeSelectedItem', res.data.product);
 
-                this.$refs.tpProducto.optSelected = this.$store.getters.tipoProductoId;
-
+                if(this.$refs.tpProducto){
+                    this.$refs.tpProducto.optSelected = this.$store.getters.tipoProductoId;
+                }
+                
                 if ( !this.$store.getters.videosLength ) {
                     this.setDefaultVideos()
                 }

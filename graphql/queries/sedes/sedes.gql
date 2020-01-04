@@ -3,8 +3,10 @@ query{
     id
     name
     code
+    calendar
     country {
+        id
         name
-    }
+    }    
   }
 }

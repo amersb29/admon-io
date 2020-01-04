@@ -18,7 +18,8 @@
             <b-col>
               <b-collapse id="createSede" ref="createSede" class="mt-2">
                   <edit-sedes-form @sede-created="sedeCreated" 
-                                   @sede-creation-error="sedeCreationError"></edit-sedes-form>
+                                   @sede-creation-error="sedeCreationError"
+                                   :selectedId="selectedId"></edit-sedes-form>
               </b-collapse>
               <b-collapse id="sedesTable" class="mt-2" :visible="sedesTableBttnIcon">
                 <b-card>
@@ -71,6 +72,7 @@ export default {
             ],
             sedesTableBttnIcon: true,
             createSedeBttnIcon: false,
+            selectedId: 0,
             updateMutation,
             deleteMutation,
         }
@@ -83,10 +85,12 @@ export default {
                 this.showDeleteProductAlert()
                 break;
                 case actions.UPDATE:
-                if( !this.$refs.createSede.show ) {
-                    this.$refs.createSede.show = true;
-                }
-                break;
+                  // this.$store.commit('changeSelectedItem', e.item)
+                  this.selectedId = +e.item.id
+                  if( !this.$refs.createSede.show ) {
+                      this.$refs.createSede.show = true;
+                  }
+                  break;
             }
         },
         sedeCreated() {

@@ -1,0 +1,9 @@
+mutation(
+    $id: ID!
+){
+    res: deleteBanner( input: {
+        id: $id
+    }){
+        id
+    }
+}

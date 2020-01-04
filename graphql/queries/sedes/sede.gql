@@ -1,0 +1,15 @@
+query($id: ID!){
+  sede(id: $id){
+    id
+    name
+    code
+    calendar
+    country {
+        id
+    }
+    banners {
+      id
+      image
+    }
+  }
+}

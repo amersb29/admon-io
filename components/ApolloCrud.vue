@@ -222,7 +222,7 @@ export default {
         editOrDelete( item, action ) {
             this.formItem = Object.assign({}, item) //para los catálogos
             this.$store.dispatch('manageAction', { action, item } ) // para Usuarios y Productos
-            this.$emit('onEditOrDelete', { action })
+            this.$emit('onEditOrDelete', { action, item })
         },
         fieldChanged(value, key){            
             this.$store.commit('changeField', {key, value})

@@ -33,7 +33,8 @@
               </b-collapse>
               <b-collapse id="createProduct" ref="createProduct" class="mt-2">
                 <edit-products-form @product-created="productCreated"
-                                    @product-creation-error="productCreationError"></edit-products-form>
+                                    @product-creation-error="productCreationError"
+                                    :selectedId="selectedId"></edit-products-form>
               </b-collapse>
               <b-collapse id="productsTable" class="mt-2" :visible="productsTableBttnIcon">
                 <b-card>
@@ -90,6 +91,7 @@ export default {
         createProductBttnIcon: false,
         filterProductBttnIcon: false,
         productsTableBttnIcon: true,
+        selectedId: 0,
         updateMutation,
         deleteMutation,
       }
@@ -107,6 +109,7 @@ export default {
           this.showDeleteProductAlert()
           break;
         case actions.UPDATE:
+          this.selectedId = +e.item.id
           if( !this.$refs.createProduct.show ) {
             this.$refs.createProduct.show = true;
           }
