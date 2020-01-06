@@ -1,128 +1,128 @@
 <template>
-  <card class="card" :title="formTitle">
-    <div>
-      <form ref="createUsrForm">
-        <b-row>
-          <b-col md="4">
-            <fg-input type="text"
-                      label="Nombre"
-                      placeholder="Escriba el Nombre"
-                      required
-                      v-model="first_name">
-            </fg-input>
-          </b-col>
-          <b-col md="4">
-            <fg-input type="text"
-                      label="Apellido(s)"
-                      placeholder="Escriba el/los Apellido(s)"
-                      required
-                      v-model="last_name">
-            </fg-input>
-          </b-col>
-          <b-col md="4">
-            <fg-input type="email"
-                      label="Correo electrónico"
-                      placeholder="Escriba el Correo electrónico"
-                      required
-                      v-model="email">
-            </fg-input>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col md="4">
-            <fg-input type="password"
-                      label="Contraseña"
-                      placeholder="Escriba la Contraseña"
-                      required
-                      v-model="password"
-                      :class='{valid:passwordValidation.valid}'>
-            </fg-input>
-          </b-col>
-          <b-col md="4">
-            <fg-input type="password"
-                      label="Confirmar Contraseña"
-                      placeholder="Confirmar Contraseña"
-                      required
-                      v-model.lazy='checkPassword'>
-            </fg-input>
-          </b-col>
-          <b-col md="4">
-            <transition name="hint" appear>
-              <div v-if='passwordValidation.errors.length > 0' class='hints'>
-                <ul>
-                  <li v-for='(error, index) in passwordValidation.errors' :key="index">{{error}}</li>
-                </ul>
-              </div>
-            </transition>
-            <div class="matches" v-if='notSamePasswords'>
-              <p>Passwords don't match.</p>
+  <b-card :title="formTitle">
+    <form ref="createUsrForm">
+      <b-row>
+        <b-col md="4">
+          <fg-input type="text"
+                    label="Nombre"
+                    placeholder="Escriba el Nombre"
+                    required
+                    v-model="first_name">
+          </fg-input>
+        </b-col>
+        <b-col md="4">
+          <fg-input type="text"
+                    label="Apellido(s)"
+                    placeholder="Escriba el/los Apellido(s)"
+                    required
+                    v-model="last_name">
+          </fg-input>
+        </b-col>
+        <b-col md="4">
+          <fg-input type="email"
+                    label="Correo electrónico"
+                    placeholder="Escriba el Correo electrónico"
+                    required
+                    v-model="email">
+          </fg-input>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md="4">
+          <fg-input type="password"
+                    label="Contraseña"
+                    placeholder="Escriba la Contraseña"
+                    required
+                    v-model="password"
+                    :class='{valid:passwordValidation.valid}'>
+          </fg-input>
+        </b-col>
+        <b-col md="4">
+          <fg-input type="password"
+                    label="Confirmar Contraseña"
+                    placeholder="Confirmar Contraseña"
+                    required
+                    v-model.lazy='checkPassword'>
+          </fg-input>
+        </b-col>
+        <b-col md="4">
+          <transition name="hint" appear>
+            <div v-if='passwordValidation.errors.length > 0' class='hints'>
+              <ul>
+                <li v-for='(error, index) in passwordValidation.errors' :key="index">{{error}}</li>
+              </ul>
             </div>
-            <div class="matches" v-else>
-              <p>
-                <i class="fa fa-check fa-2x"></i>
-              </p>
-            </div>
-          </b-col>
-        </b-row>
+          </transition>
+          <div class="matches" v-if='notSamePasswords'>
+            <p>Passwords don't match.</p>
+          </div>
+          <div class="matches" v-else>
+            <p>
+              <i class="fa fa-check fa-2x"></i>
+            </p>
+          </div>
+        </b-col>
+      </b-row>
 
-        <b-row>
-          <b-col md="4">
-            <label for="countries">Pa&iacute;s</label>
-            <apollo-select
-              ref="apollo_countries"
-              gqlQuery="countries"
-              selectedValue="1" 
-              optionText="name"
-              @change="onSelectChange($event, 'country')"
-            />
-          </b-col>
-          <b-col md="4">
-            <label for="memberships">Membres&iacute;a</label>
-            <!-- <b-select v-model="membership">
-              <option :selected="membership === 0" value="0">Sin membres&iacute;a</option>
-              <option :selected="membership === 1" value="1">Premium</option>
-              <option :selected="membership === 2" value="2">Platinum</option>
-            </b-select> -->
-            <apollo-select
-              @change="onSelectChange($event, 'membership')"
-              gqlQuery="memberships" 
-              initialNullText="Sin membresía"
-              optionText="name"
-              ref="apollo_memberships"/>            
-          </b-col>
-          <b-col md="4">
-            <label for="state">Estado</label>
-            <b-form-select ref="state" id="state" class="custom-dropdown" v-model="state">
-              <option value="0" selected>Inactivo</option>
-              <option value="1" >Activo</option>
-            </b-form-select>
-          </b-col>
-        </b-row>
+      <b-row>
+        <b-col md="4">
+          <label for="countries">Pa&iacute;s</label>
+          <apollo-select
+            ref="apollo_countries"
+            gqlQuery="countries"
+            selectedValue="1" 
+            optionText="name"
+            @change="onSelectChange($event, 'country')"
+          />
+        </b-col>
+        <b-col md="4">
+          <label for="memberships">Membres&iacute;a</label>
+          <!-- <b-select v-model="membership">
+            <option :selected="membership === 0" value="0">Sin membres&iacute;a</option>
+            <option :selected="membership === 1" value="1">Premium</option>
+            <option :selected="membership === 2" value="2">Platinum</option>
+          </b-select> -->
+          <apollo-select
+            @change="onSelectChange($event, 'membership')"
+            gqlQuery="memberships" 
+            initialNullText="Sin membresía"
+            optionText="name"
+            ref="apollo_memberships"/>            
+        </b-col>
+        <b-col md="4">
+          <label for="state">Estado</label>
+          <b-form-select ref="state" id="state" class="custom-dropdown" v-model="state">
+            <option value="0" selected>Inactivo</option>
+            <option value="1" >Activo</option>
+          </b-form-select>
+        </b-col>
+      </b-row>
 
-        <b-row>
-          <b-col md="4">
-            <label for="role">Perfil</label>
-            <apollo-select
-              ref="apollo_roles"
-              gqlQuery="roles"
-              optionText="name"
-              multiple
-              :arrayModel="roles"
-              @change="onSelectChange($event, 'roles')"
-            />
-          </b-col>
-          <b-col md="8">
-            <div class="form-group">
-              <label>Notas</label>
-              <textarea rows="5" class="form-control border-input"
-                        placeholder="Here can be your description"
-                        v-model="notes">
-              </textarea>
-            </div>
-          </b-col>
-        </b-row>
+      <b-row>
+        <b-col md="4">
+          <label for="role">Perfil</label>
+          <apollo-select
+            ref="apollo_roles"
+            gqlQuery="roles"
+            optionText="name"
+            multiple
+            :arrayModel="roles"
+            @change="onSelectChange($event, 'roles')"
+          />
+        </b-col>
+        <b-col md="8">
+          <div class="form-group">
+            <label>Notas</label>
+            <textarea rows="5" class="form-control border-input"
+                      placeholder="Here can be your description"
+                      v-model="notes">
+            </textarea>
+          </div>
+        </b-col>
+      </b-row>
 
-        <div class="text-center">
+      <b-row>
+        <b-col>
           <div class="formButtonsSection">
               <b-button-group>
                   <b-button :variant="buttonVariant" 
@@ -139,11 +139,11 @@
                   </b-button>
               </b-button-group>
           </div>
-        </div>
-        <div class="clearfix"></div>
-      </form>
-    </div>
-  </card>
+        </b-col>
+      </b-row>
+      <div class="clearfix"></div>
+    </form>
+  </b-card>
 </template>
 
 <script>

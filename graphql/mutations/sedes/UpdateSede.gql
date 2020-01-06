@@ -4,7 +4,8 @@ mutation(
     $name: String
     $code: String
     $calendar: String
-    $files: [Upload!]
+    $banners: [CreateBannerInput!]
+    $files: [Upload]
 ){
     res: updateSede( input: {
         id: $id
@@ -12,12 +13,14 @@ mutation(
         name: $name
         code: $code
         calendar: $calendar
+        banners: { create: $banners }
     }){
         id
         name
         code
         calendar
         country {
+            id
             name
         }
     }

@@ -85,7 +85,6 @@ export default {
                 this.showDeleteProductAlert()
                 break;
                 case actions.UPDATE:
-                  // this.$store.commit('changeSelectedItem', e.item)
                   this.selectedId = +e.item.id
                   if( !this.$refs.createSede.show ) {
                       this.$refs.createSede.show = true;
@@ -101,7 +100,7 @@ export default {
                 timer: 4000,  
             })
 
-            const op =this.$store.state.action === actions.CREATE ? 'creada' : 'actualizada' ;
+            const op = this.$store.state.action === actions.CREATE ? 'creada' : 'actualizada' ;
             mixin.fire(`La Sede ha sido ${op}`, '', 'success')
         },
         sedeCreationError() {

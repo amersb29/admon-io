@@ -283,8 +283,25 @@ export default {
         showDetails( id ){
             this.$emit('onDetails', {id})
         },
-        updateCache(store, {data: { res } }){
-            this.$store.dispatch('updateCache', {store, res}) 
+        updateCache(store, {data: { res } }) {
+            const query = {query: this.$store.getters.query };
+
+            const data = store.readQuery( query )
+
+            if(state.action === acts.CREATE){
+                data[ this.$store.getters.catalogId ].push(res)
+            }
+
+            if(state.action === acts.DELETE) {
+                let index = data[ this.$store.getters.catalogId ].findIndex( obj => obj.id === res.id )
+                data[ this.$store.getters.catalogId ].splice(index, 1)
+            }
+
+            // Write back to the cache
+            store.writeQuery({
+                ...query,
+                data,
+            })
         },
         updateTotalRows(length) { this.totalRows = length },
     }

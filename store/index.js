@@ -130,25 +130,5 @@ export const actions = {
         }
         
         commit('setVideoName', {idx, newName})
-    },
-    updateCache( { state, getters } , { store, res } ){
-        const query = {query: state.query };
-
-        const data = store.readQuery( query )
-
-        if(state.action === acts.CREATE){
-            data[ getters.catalogId ].push(res)
-        }
-
-        if(state.action === acts.DELETE){
-            let index = data[ getters.catalogId ].findIndex( obj => obj.id === res.id )
-            data[ getters.catalogId ].splice(index, 1)
-        }
-
-        // Write back to the cache
-        store.writeQuery({
-            ...query,
-            data,
-        })
     }
 }

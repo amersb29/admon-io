@@ -252,9 +252,6 @@ export default {
         toggleImgFile() {
             this.toggleImg = !this.toggleImg
         },
-        updateMethod(store, {data: { res } }){
-            this.$store.dispatch('updateCache', {store, res}) 
-        },
         updateFileList(event) {            
             this.$store.dispatch('manageFile', event.target.files[0])
         }

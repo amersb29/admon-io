@@ -84,7 +84,7 @@
             </b-card>
 
           </div>
-          <div class="formButtonsSection">
+          <div class="formButtonsSection margin-top-50">
             <b-button-group>
                 <b-button :variant="buttonVariant" class="formButtons" @click="createSede()">
                     <i :class="`fa fa-${actionButton} fa-lg`"></i>
@@ -111,6 +111,7 @@ import createMutation from '@/graphql/mutations/sedes/CreateSede.gql'
 import deleteBannerMutation from '@/graphql/mutations/banners/DeleteBanner.gql'
 import sede from '@/graphql/queries/sedes/sede.gql'
 import actions from '@/enums/actions'
+import gql from 'graphql-tag'
 
 export default {
     name: 'edit-sedes-form',
@@ -133,6 +134,8 @@ export default {
           image: '',
           status: true
         },
+        banners: [],
+        previews: []
       }
     },
     computed: {
@@ -141,12 +144,6 @@ export default {
       },
       actionButtonTxt() {
           return this.$store.state.action === actions.CREATE ? 'Salvar' : 'Actualizar' 
-      },
-      banners() {
-         if(this.$store.getters.banners)
-        {
-          return this.$store.getters.banners.filter(b => b.image === "")
-        }
       },
       buttonVariant(){
           return this.$store.state.action === actions.CREATE ? 'primary' : 'warning'
@@ -175,19 +172,13 @@ export default {
             this.$store.commit('changeField', {key: 'calendar', value})
         }
       },
-      previews() {
-        if(this.$store.getters.banners)
-        {
-          return this.$store.getters.banners.filter(b => b.image !== "" && b.image !== undefined)
-        }
-      },
       showCollapse() {
         return this.$store.state.action === actions.CREATE
       }
     },
     methods: {
       addBanner() {
-        this.$store.commit('addItemToList', {key: 'banners', item: Object.assign({},this.emptyBanner)});
+        this.banners.push( Object.assign({},this.emptyBanner) )
       },
       createSede() {
         const form = this.$refs.sedeForm
@@ -197,16 +188,20 @@ export default {
         }else {
             this.$apollo.mutate({
                 mutation: this.$store.getters.mutation,
-                variables: this.$store.state.selectedItem,
+                variables: this.getVariables(),
                 update: this.updateMethod
             }).then((data) => {
-                this.$emit('sede-created', {action: this.$store.state.action})
-                this.resetForm();
+              this.$emit('sede-created', {action: this.$store.state.action})
+              this.$apollo.query({
+                query: gql`query{ banners(sede_id: 1) {id} }`
+              })
+              this.resetForm();
             }).catch((error) => {
                 this.$emit('sede-creation-error')
             })
         }
 
+        form.reset()
         form.classList.add('was-validated')
       },
       deleteBanner(id) {
@@ -214,34 +209,45 @@ export default {
                 mutation: deleteBannerMutation,
                 variables: {id}
             }).then( ({data: {res: {id: deletedId } }}) => {
-              // this.previews.splice(this.previews.findIndex(p => p.id === deletedId), 1)
-              this.$store.commit('removeItemFromList', { key: 'banners', deletedId})
+                this.previews.splice(this.previews.findIndex(p => p.id === deletedId), 1)
               })
       },
       async fillForm(id) {
           if (!!+id && id !== -1) {
-              const res = await this.$apollo.query({
-                  query: sede,
-                  variables: {
-                      id
-                  },
-                  fetchPolicy: 'no-cache',
-              })
-              
-              this.$store.commit('changeSelectedItem', res.data.sede)
-              this.$store.commit('addItemToList', {key: 'banners', item: Object.assign({},this.emptyBanner)});
+            const res = await this.$apollo.query({
+                query: sede,
+                variables: {
+                    id
+                },
+                fetchPolicy: 'no-cache',
+            })
+            
+            this.$store.commit('changeSelectedItem', res.data.sede)
+            const {banners} = res.data.sede 
+            this.banners = banners.filter(b => b.image === "")
+            this.previews = banners.filter(b => b.image !== "" && b.image !== undefined)
 
-              if(this.$refs.apollo_countries)
-              {
-                this.$refs.apollo_countries.optSelected = this.$store.getters.field('country').id
-              }
-   
-              this.scrollToTop()
-          }
+            if(this.$refs.apollo_countries)
+            {
+              this.$refs.apollo_countries.optSelected = this.$store.getters.field('country').id
+            }
+  
+            this.setDefaultBanners()
+            this.scrollToTop()
+        }
       },
       getBannerText(idx, flag = false){
           let text = `Banner ${++idx}` 
           return flag ? text.toLowerCase().replace(/\s/g, '') : text 
+      },
+      getVariables() {
+        switch (this.$store.state.action) {
+          case actions.UPDATE:
+            this.$store.commit('updateArrayList', {key: 'banners', list: this.banners })
+            break;
+          }
+
+          return this.$store.state.selectedItem
       },
       onSelectChange(value) { 
         this.$store.commit('changeField', {key: 'countries_id', value})
@@ -265,50 +271,61 @@ export default {
           this.setDefaultBanners()
       },
       setDefaultBanners() {
-          this.$store.commit('updateArrayList', {key: 'banners', list: [Object.assign({},this.emptyBanner)] } );
+          this.banners.length = 0
+          this.banners.push(Object.assign({},this.emptyBanner))
       },
       scrollToTop(){
           window.scrollTo(0,0)
       },
-      updateFileList(event, idx) {            
-          this.$store.commit('updateArrObjProp', { arr: 'banners', 
-                                                   idx, 
-                                                   prop: 'image', 
-                                                   value: event.target.files[0].name
-                                                  }) 
-
+      updateFileList(event, idx) {
+          this.banners[idx].image = event.target.files[0].name
           this.$store.commit('addItemToList', {key: 'files', item: event.target.files[0]})
-      },
-      updateMethod(store, {data: { res } }){
-          this.$store.dispatch('updateCache', {store, res}) 
       },
     },
 }
 </script>
 
 <style>
-.formCard{
+.collapse .card-body
+{
+  min-height: 150px;
+}
+
+.formCard
+{
     min-height: 375px;
 }
 
-#previews {
+.formButtonsSection
+{
+  bottom: 20px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+#previews
+{
   height: 280px; 
   margin-bottom: 10px;
   overflow-y: scroll; 
 }
 
-.previewContainer {
+.previewContainer
+{
   position: relative;
   width: 100%;
   max-width: 475px;
 }
 
-.previewContainer img {
+.previewContainer img 
+{
   width: 100%;
   height: auto;
 }
 
-.previewContainer .btn {
+.previewContainer .btn 
+{
   position: absolute;
   top: 50%;
   left: 50%;
